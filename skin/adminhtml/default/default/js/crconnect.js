@@ -57,7 +57,7 @@ Crconnect.prototype = {
     },
     reloadKeysBlock: function (editData) 
     {
-        var select = '<select class="crconnect-groups-select" onchange="Crconnect.changeSubGroup(this)" id="#{_id}_crconnect" name="groups[crconnect][fields][groups_keys][value][#{_id}][crconnect]">';
+        var select = '<select class="crconnect-groups-select" onchange="CrC.changeSubGroup(this)" id="#{_id}_crconnect" name="groups[crconnect][fields][groups_keys][value][#{_id}][crconnect]">';
         select += '<option value="">' + Translator.translate('Please select subscribers group') + '</option>';
         if (editData) {
             for (var i = 0; i < editData.length; i++) {
@@ -187,10 +187,11 @@ Crconnect.prototype = {
     }
 };
 
+var CrC;
 function initCleverReach() 
 {
     try {
-        var CrC = new Crconnect(crconnectOptions, crconnectElements);
+        CrC = new Crconnect(crconnectOptions, crconnectElements);
         CrC.confirmMainKey();
         Event.observe('crroot_crconnect_api_key', 'keyup', function () { CrC.confirmEnable(); });
         Event.observe('crroot_crconnect_list_id', 'change', function () { CrC.changeGroupId(); });

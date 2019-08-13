@@ -14,7 +14,7 @@ class Conlabz_CrConnect_Block_Config_Key extends Mage_Adminhtml_Block_System_Con
     {
     
         $element = parent::_getElementHtml($element);
-        $element .= '<button style="" onkeyup="Crconnect.confirmEnable()" onclick="Crconnect.confirmMainKey(true)" id="confirm-key-button" class="scalable disabled" type="button" disabled>
+        $element .= '<button style="" onkeyup="CrC.confirmEnable()" onclick="CrC.confirmMainKey(true)" id="confirm-key-button" class="scalable disabled" type="button" disabled>
                         <span>'.Mage::helper("crconnect")->__("Confirm key").'</span>
                     </button>';
         

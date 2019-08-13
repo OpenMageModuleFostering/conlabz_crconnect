@@ -69,7 +69,7 @@ class Conlabz_CrConnect_Block_Config_GroupsApis extends Mage_Adminhtml_Block_Sys
                 $rendered .= '</select>';
                 break;
             case 'crconnect':
-                $rendered = '<select style="width: 200px" class="crconnect-groups-select" onchange="Crconnect.changeSubGroup(this)" id="'.$inputId.'" name="'.$inputName.'"><option value="">'.Mage::helper('crconnect')->__('Please select subscribers group').'</option>';
+                $rendered = '<select style="width: 200px" class="crconnect-groups-select" onchange="CrC.changeSubGroup(this)" id="'.$inputId.'" name="'.$inputName.'"><option value="">'.Mage::helper('crconnect')->__('Please select subscribers group').'</option>';
                 foreach ($groups as $group) {
                     $rendered .= '<option value="'.$group->id.'">'.$group->name.'</option>';
                 }
