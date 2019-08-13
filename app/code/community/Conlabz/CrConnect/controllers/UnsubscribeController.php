@@ -24,11 +24,11 @@ class Conlabz_CrConnect_UnsubscribeController extends Mage_Core_Controller_Front
     public function indexAction()
     {
         // don't do anything if we didn't get the email parameter
-        if (isset($_GET['email'])) {
-            $email = $_GET['email'];
+        $request = $this->getRequest();
+        if ($email = $request->getParam('email')) {
             $apiKey = trim(Mage::getStoreConfig('newsletter/crconnect/api_key'));
             $listID = trim(Mage::getStoreConfig('newsletter/crconnect/list_id'));
-            
+            $session = Mage::getSingleton('core/session');
             // Check that the email address actually is unsubscribed in
             // CleverReach
             if ($apiKey && $listID) {
@@ -50,19 +50,19 @@ class Conlabz_CrConnect_UnsubscribeController extends Mage_Core_Controller_Front
                 } else {
                     Mage::log("CleverReach_CrConnect: Error - ".$tmp->message);
                 }
-                
+
                 // If we are unsubscribed in cleverreach, mark us as
                 // unsubscribed in Magento.
                 if ($tmp->data->deactivated) {
                     try {
                         Mage::log("CleverReach_CrConnect: Unsubscribing $email");
-                        $collection = Mage::getModel('newsletter/subscriber')
+                        Mage::getModel('newsletter/subscriber')
                                 ->loadByEmail($email)
                                 ->unsubscribe();
 
                         Mage::getSingleton('customer/session')->addSuccess($this->__('You were successfully unsubscribed'));
                     } catch (Exception $e) {
-                        Mage::log("CleverReach_CrConnect: ".$e->getMessage());
+                        Mage::log("CleverReach_CrConnect: " . $e->getMessage());
                         Mage::getSingleton('customer/session')->addError($this->__('There was an error while saving your subscription details'));
                     }
                 } else {
@@ -70,7 +70,7 @@ class Conlabz_CrConnect_UnsubscribeController extends Mage_Core_Controller_Front
                 }
             }
         }
-        
-        $this->_redirect('customer/account/');
+
+        $this->_redirect('customer/account');
     }
 }

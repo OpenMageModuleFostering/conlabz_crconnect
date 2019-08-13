@@ -28,26 +28,26 @@ include "Mage/Newsletter/controllers/SubscriberController.php";
 // overrides the newAction method.
 class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberController
 {
-    
+
     public function confirmAction()
     {
         $id    = (int) $this->getRequest()->getParam('id');
         $code  = (string) $this->getRequest()->getParam('code');
-        
+
         if ($id && $code) {
             $subscriber = Mage::getModel('newsletter/subscriber')->load($id);
             $session = Mage::getSingleton('core/session');
-            
+
             if ($subscriber->getId() && $subscriber->getCode()) {
                 if ($subscriber->confirm($code)) {
                     Mage::log("Cleverreach_CrConnect: newsletter signup for ".$subscriber->getEmail().", confirmation");
-                    
+
                     $apiKey = trim(Mage::getStoreConfig('crroot/crconnect/api_key'));
                     $listID = trim(Mage::getStoreConfig('crroot/crconnect/list_id'));
                     $confirm = trim(Mage::getStoreConfig('newsletter/subscription/confirm'));
-                    
 
-                    
+
+
                     $customer = Mage::getModel('customer/customer')->setWebsiteId(Mage::app()->getStore()->getWebsiteId())->loadByEmail($subscriber->getEmail());
 
                     if ($customer->getId()) {
@@ -59,9 +59,9 @@ class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberControl
                                 }
                             }
                         }
-                    
+
                     }
-                    
+
                     try {
                         $client = new SoapClient(
                             Mage::helper('crconnect')->getWsdl(),
@@ -72,14 +72,14 @@ class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberControl
                         $session->addException($e, $this->__('There was a problem with the subscription'));
                         $this->_redirectReferer();
                     }
-                    
+
                     try {
                         $result = $client->receiverAdd($apiKey, $listID, array(
                                 "email" => $subscriber->getEmail(),
                                 "source" => "MAGENTO (frontend)",
                                 "attributes" => array("key" => "newsletter", "value" => "1"),
                         ));
-                      
+
                         if ($result->status!="SUCCESS" && $result->statuscode == "50") {
                             $result = $client->receiverUpdate($apiKey, $listID, array(
                                 "email" => $subscriber->getEmail(),
@@ -87,15 +87,15 @@ class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberControl
                                 "attributes" => array("key" => "newsletter", "value" => "1"),
                                 "deactivated"=>0
                             ));
-                        
+
                         }
-                      
+
                     } catch (Exception $e) {
                         Mage::log("CleverReach_CrConnect: Error in SOAP call: ".$e->getMessage());
                         $session->addException($e, $this->__('Subscription was invalid'));
                         $this->_redirectReferer();
                     }
-                    
+
                     parent::confirmAction();
                 } else {
                     $session->addError($this->__('Invalid subscription confirmation code'));
@@ -107,23 +107,23 @@ class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberControl
 
         $this->_redirectUrl(Mage::getBaseUrl());
     }
-        
-    
+
+
     public function newAction()
     {
-    
+
         if ($this->getRequest()->isPost() && $this->getRequest()->getPost('email')) {
             $session            = Mage::getSingleton('core/session');
             $customerSession    = Mage::getSingleton('customer/session');
             $email              = (string) $this->getRequest()->getPost('email');
-        
+
             $apiKey = trim(Mage::getStoreConfig('crroot/crconnect/api_key'));
             $listID = trim(Mage::getStoreConfig('crroot/crconnect/list_id'));
             $confirm = trim(Mage::getStoreConfig('newsletter/subscription/confirm'));
 
             if ($apiKey && $listID && !$confirm) {
                 Mage::log("Cleverreach_CrConnect: newsletter signup for $email, no confirmation");
-                
+
                 try {
                     $client = new SoapClient(Mage::helper('crconnect')->getWsdl(), array("trace" => true));
                 } catch (Exception $e) {
@@ -142,7 +142,7 @@ class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberControl
 /*                     	$result = $client->receiverGetByEmail($apiKey, $listID, 'alex.nuzil@conlabz.de', 1); */
 /*                     	var_dump($result); */
 /*                     	exit; */
-                        
+
                     if (Mage::getStoreConfig('crroot/crconnect/showgroup') == '1') {
                         $groupKeys = Mage::helper('crconnect')->getKeys();
                         if ($groupId = $customerSession->getCustomerGroupId()) {
@@ -151,7 +151,7 @@ class Conlabz_CrConnect_HookController extends Mage_Newsletter_SubscriberControl
                             }
                         }
                     }
-                        
+
                     $result = $client->receiverAdd($apiKey, $listID, array(
                                 "email" => $email,
                                 "source" => "MAGENTO (frontend)",

@@ -1,16 +1,11 @@
 <?php
-class Conlabz_Crconnect_Adminhtml_ConfigController extends Mage_Adminhtml_Controller_Action
+class Conlabz_Crconnect_Adminhtml_CrconfigController extends Mage_Adminhtml_Controller_Action
 {
-
-    
     const EMPTY_CODE = "empty";
-    
+
     public function confirmKeyAction()
     {
-        
         $apiKey = $this->getRequest()->getParam("key");
-        //Mage::helper("crconnect")->setApiKey($apiKey);
-        
         $api = Mage::getModel("crconnect/api");
         if ($api->isConnected()) {
             $groups = $api->getGroupsForKey($apiKey);
@@ -20,15 +15,13 @@ class Conlabz_Crconnect_Adminhtml_ConfigController extends Mage_Adminhtml_Contro
                 $this->getResponse()->setBody(self::EMPTY_CODE);
             }
         }
-        
     }
-    
+
     public function changeGroupAction()
     {
-        
         $groupId = $this->getRequest()->getParam("group");
         $apiKey = $this->getRequest()->getParam("key");
-        
+
         $api = Mage::getModel("crconnect/api");
         if ($api->isConnected()) {
             $forms = $api->getFormsForGroup($apiKey, $groupId);
@@ -38,19 +31,19 @@ class Conlabz_Crconnect_Adminhtml_ConfigController extends Mage_Adminhtml_Contro
                 $this->getResponse()->setBody(self::EMPTY_CODE);
             }
         }
-        
     }
-    
+
     public function getGroupsBlockAction()
     {
-        
-        echo Mage::app()->getLayout()->createBlock('crconnect/config_groupsapis')->toHtml();
-        
+        $this->getResponse()->setBody(
+            $this->getLayout()
+                ->createBlock('crconnect/config_groupsApis')
+                ->toHtml()
+        );
     }
+
     protected function _isAllowed()
     {
-    
         return true;
-    
     }
 }

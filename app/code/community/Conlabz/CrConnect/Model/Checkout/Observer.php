@@ -19,17 +19,15 @@
  */
 class Conlabz_CrConnect_Model_Checkout_Observer
 {
-    public function success_action($observer)
+    public function success_action()
     {
-        $event = $observer->getEvent();
-        
         $email = false;
         $apiKey = trim(Mage::getStoreConfig('crroot/crconnect/api_key'));
         $listID = trim(Mage::getStoreConfig('crroot/crconnect/list_id'));
-        
+
         $syncOrders = trim(Mage::getStoreConfig('crroot/crconnect/sync_orders'));
         $syncOrderStatus = trim(Mage::getStoreConfig('crroot/crconnect/sync_order_status'));
-        
+
         if ($syncOrders) {
             $lastOrderId = Mage::getSingleton('checkout/session')->getLastOrderId();
         } else {
@@ -39,21 +37,21 @@ class Conlabz_CrConnect_Model_Checkout_Observer
         if ($lastOrderId) {
                 $order = Mage::getModel('sales/order')->load($lastOrderId);
                 $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-                
+
                 $subscribed = $customer->getIsSubscribed();
-                
+
             if ($subscribed === null) {
                 $subscribed = Mage::getModel('newsletter/subscriber')->loadByCustomer($customer)->isSubscribed();
             }
-                
+
             if ($subscribed) {
                 $add = array("newsletter" => "1");
             } else {
                 $add = array("newsletter" => "0");
             }
-            
+
                 $email = $order->getCustomerEmail();
-                
+
             if ($email) {
                 if ($customer->getEmail()) {
                     $crReceiver = Mage::helper('crconnect')->prepareUserdata($customer, $add, false);
@@ -75,21 +73,21 @@ class Conlabz_CrConnect_Model_Checkout_Observer
                                                 7 => array("key" => "title", "value" => @$shippingAddress["suffix"]),
                                                 8 => array("key" => "company", "value" => @$shippingAddress["company"]))
                         );
-                            
+
                         $cookie = Mage::getSingleton('core/cookie');
                         if ($cookie->get('crmailing')) {
                             $crReceiver['orders'][0]['mailings_id'] = $cookie->get('crmailing');
                         }
-                            
+
                         if ($subscribed) {
                             $crReceiver["attributes"][] = array("key" => 'newsletter', "value" => "1");
                         }
                     }
                 }
             }
-                
+
         }
-        
+
         if ($apiKey && $listID && $email && $lastOrderId && $syncOrders) {
             try {
                 $client = new SoapClient(Mage::helper('crconnect')->getWsdl(), array("trace" => true));
@@ -107,7 +105,7 @@ class Conlabz_CrConnect_Model_Checkout_Observer
                         $tmp["deactivated"] = 0;
                         $addTxt = "forced active";
                     }
-                        
+
                     // Get keys for different user groups
                     if (Mage::getStoreConfig('crroot/crconnect/showgroup') == '1') {
                         $groupKeys = Mage::helper('crconnect')->getKeys();
@@ -119,7 +117,7 @@ class Conlabz_CrConnect_Model_Checkout_Observer
                     } else {
                         $return = $client->receiverAdd($apiKey, $listID, $tmp);
                     }
-                        
+
                     if ($return->status=="SUCCESS") {
                         Mage::log("CleverReach_CrConnect: subscribed ($addTxt) - ".$crReceiver["email"]);
                     } else {
@@ -138,9 +136,9 @@ class Conlabz_CrConnect_Model_Checkout_Observer
                     Mage::log("CleverReach_CrConnect: Error in SOAP call: ".$e->getMessage());
                 }
             }
-            
+
             /* ########################### */
-            
+
             $items = $order->getAllItems();
             if ($items) {
                 foreach ($items as $item) {
@@ -153,12 +151,12 @@ class Conlabz_CrConnect_Model_Checkout_Observer
                     $tmpItem["purchase_date"] = time();
                     $tmpItem["currency"] = $order->getData('order_currency_code');
                     $tmpItem["source"] = "MAGENTO Order";
-                
+
                     $cookie = Mage::getSingleton('core/cookie');
                     if ($cookie->get('crmailing')) {
                         $tmpItem['mailings_id'] = $cookie->get('crmailing');
                     }
-                
+
                     $tmp = $client->receiverAddOrder($apiKey, $listID, $email, $tmpItem);
                     if ($tmp->status!="SUCCESS") {
                         Mage::log("CleverReach_CrConnect: Error - ".$tmp->message);

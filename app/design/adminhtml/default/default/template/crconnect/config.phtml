@@ -1,0 +1,15 @@
+<?php
+/* @var $this Mage_Adminhtml_Block_Template */
+/* @var $helper Conlabz_CrConnect_Helper_Data */
+$helper = $this->helper('crconnect');
+?>
+<script>
+    var crconnectOptions = {
+        baseConfirmKeyUrl: "<?php echo $this->getUrl("adminhtml/crconfig/confirmKey")?>",
+        baseChangeGroupUrl:"<?php echo $this->getUrl("adminhtml/crconfig/changeGroup")?>",
+        baseGroupsBlockUrl: "<?php echo $this->getUrl("adminhtml/crconfig/getGroupsBlock")?>",
+        savedDefaultListId: "<?php echo $helper->getDefaultListId();?>",
+        savedDefaultFormId: "<?php echo $helper->getDefaultFormId();?>",
+        savedFormsKeys: <?php echo $this->helper('core')->jsonEncode($helper->getFormsIdsByKeys()) ?>
+    };
+</script>

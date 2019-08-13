@@ -4,12 +4,10 @@ include "Mage/Newsletter/controllers/ManageController.php";
 
 class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageController
 {
-
     public function saveAction()
     {
-    
         if (!$this->_validateFormKey()) {
-            return $this->_redirect('customer/account/');
+            return $this->_redirect('customer/account');
         }
         try {
             $email = Mage::getSingleton('customer/session')->getCustomer()->getEmail();
@@ -24,7 +22,7 @@ class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageControlle
                     } else {
                         Mage::getSingleton('customer/session')->addSuccess($this->__('Thank you for your subscription.'));
                     }
-                    
+
                 }
             } else {
                 if ($subscriber->isSubscribed()) {
@@ -55,6 +53,6 @@ class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageControlle
             Mage::getSingleton('customer/session')->addError($e->getMessage());
             Mage::getSingleton('customer/session')->addError($this->__('An error occurred while saving your subscription.'));
         }
-        $this->_redirect('customer/account/');
+        $this->_redirect('customer/account');
     }
 }

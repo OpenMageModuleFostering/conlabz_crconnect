@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jstranslator>
+    <please-select-group translate="message" module="crconnect">
+        <message>Please select subscribers group</message>
+    </please-select-group>
+    <please-select-form translate="message" module="crconnect">
+        <message>Please select form</message>
+    </please-select-form>
+    <please-select-form-default translate="message" module="crconnect">
+        <message>No forms to select</message>
+    </please-select-form-default>
+    <please-select-group-default translate="message" module="crconnect">
+        <message>No groups to select</message>
+    </please-select-group-default>
+</jstranslator>

@@ -41,148 +41,122 @@ function callRowDelete(id){
 </div>
 <script type="text/javascript">
 // <!--
-            var editedSelects = new Array();
-            var stringElements = new Array();
-<?php foreach ($this->_columns as $columnName => $column): ?>
-        stringElements['<?php echo $columnName; ?>'] = '<?php echo $this->_renderCellTemplate($columnName) ?>';
-<?php endforeach; ?>
+    var crconnectElements = {
+        editedSelects: new Array(),
+        stringElements: new Array()
+    };
+    <?php foreach ($this->_columns as $columnName => $column): ?>
+        crconnectElements.stringElements['<?php echo $columnName; ?>'] = '<?php echo $this->_renderCellTemplate($columnName) ?>';
+    <?php endforeach; ?>
     var rowTemplate = "";
-            function initRowTemplate(){
-            rowTemplate = new Template(
-                    '<tr id="#{_id}" class="simple-added-row">'
-<?php foreach ($this->_columns as $columnName => $column): ?>
+    function initRowTemplate()
+    {
+        rowTemplate = new Template(
+            '<tr id="#{_id}" class="simple-added-row">'
+            <?php foreach ($this->_columns as $columnName => $column): ?>
                 + '<td class="#{_id}-<?php echo $columnName ?>">'
-                        + stringElements['<?php echo $columnName; ?>']
-                        + '</td>'
-<?php endforeach; ?>
-<?php if ($this->_addAfter): ?>
+                + crconnectElements.stringElements['<?php echo $columnName; ?>']
+                + '</td>'
+            <?php endforeach; ?>
+            <?php if ($this->_addAfter): ?>
                 + '<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><?php echo Mage::helper('adminhtml')->__('Add after') ?></span></button></td>'
-<?php endif; ?>
-            + '<td><button onclick="arrayRow<?php echo $_htmlId ?>.del(\'#{_id}\')" class="scalable delete" type="button"><span><?php echo Mage::helper('adminhtml')->__('Delete') ?></span></button></td>'
-                    + '</tr>'
-                    );
-            }
-    initRowTemplate();
-// create row creator
-            var arrayRow<?php echo $_htmlId ?> = {
-            // define row prototypeJS template
-            template : new Template(
-                    '<tr id="#{_id}" class="simple-added-row">'
-<?php foreach ($this->_columns as $columnName => $column): ?>
-                + '<td class="#{_id}-<?php echo $columnName ?>">'
-                        + stringElements['<?php echo $columnName; ?>']
-                        + '</td>'
-<?php endforeach; ?>
-<?php if ($this->_addAfter): ?>
-                + '<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><?php echo Mage::helper('adminhtml')->__('Add after') ?></span></button></td>'
-<?php endif; ?>
-            + '<td><button onclick="arrayRow<?php echo $_htmlId ?>.del(\'#{_id}\')" class="scalable delete" type="button"><span><?php echo Mage::helper('adminhtml')->__('Delete') ?></span></button></td>'
-                    + '</tr>'
-                    ),
-                    rowsCount : 0,
-                    add : function(templateData, insertAfterId)
-                    {
-                    // generate default template data
-                    if ('' == templateData) {
-                    var d = new Date();
-                            var templateData = {
-<?php foreach ($this->_columns as $columnName => $column): ?>
-    <?php echo $columnName ?> : '',
-<?php endforeach; ?>
-                            _id : '_' + d.getTime() + '_' + d.getMilliseconds()
-                            };
-                    }
-
-
-                    // insert before last row
-                    if ('' == insertAfterId) {
-                    new Insertion.Before(
-                            $('addRow<?php echo $_htmlId ?>'),
-                            rowTemplate.evaluate(templateData)
-                            );
-                    }
-                    // insert after specified row
-                    else {
-                    new Insertion.After(
-                            $(insertAfterId),
-                            rowTemplate.evaluate(templateData)
-                            );
-                    }
-                    // set the selected drop-down list item
-<?php foreach ($this->_columns as $columnName => $column): ?>
-                        var options = $$('td.' + templateData._id + '-' + '<?php echo $columnName ?>' + ' option')
-                                for (var index = 0; index < options.length; ++index)
-                        {
-                        var option = options[index]
-                                if (option.getAttribute('value') == templateData.<?php echo $columnName ?>)
-                        {
-                        option.selected = true
-    <?php if ($columnName == "crconnect"): ?>
-                            editedSelects.push(templateData._id);
-                                    //                    Event.observe(window, 'load', Crconnect.changeSubGroup($(templateData._id+"_crconnect")));
-    <?php endif; ?>
-                        }
-                        }
-<?php endforeach; ?>
-
-<?php if ($this->_addAfter): ?>
-                        Event.observe('addAfterBtn' + templateData._id, 'click', this.add.bind(this, '', templateData._id));
-<?php endif; ?>
-
-                    this.rowsCount += 1;
-                    },
-                    del : function(rowId)
-                    {
-                    $(rowId).remove();
-                            this.rowsCount -= 1;
-                            if (0 == this.rowsCount) {
-                    this.showButtonOnly();
-                    }
-                    },
-                    showButtonOnly : function()
-                    {
-                    $('grid<?php echo $_htmlId ?>').hide();
-                            $('empty<?php echo $_htmlId ?>').show();
-                    }
-            }
-
-// bind add action to "Add" button in last row
-//Event.observe('addToEndBtn<?php echo $_htmlId ?>', 'click', arrayRow<?php echo $_htmlId ?>.add.bind(arrayRow<?php echo $_htmlId ?>, '', ''));
-
-// add existing rows
-<?php
-$_addAfterId = "headings{$_htmlId}";
-foreach ($this->getArrayRows() as $_rowId => $_row) {
-    echo "arrayRow{$_htmlId}.add(" . $_row->toJson() . ", '{$_addAfterId}');\n";
-    /* print "%%%%%%%%%%%%%%%";
-      print_r($_row->toJson()); */
-    $_addAfterId = $_rowId;
-}
-?>
-
-    function emptyAction(){
-
-    $('grid<?php echo $_htmlId ?>').show();
-            $('empty<?php echo $_htmlId ?>').hide();
-            arrayRow<?php echo $_htmlId ?>.add('', '');
+            <?php endif; ?>
+                + '<td><button onclick="arrayRow<?php echo $_htmlId ?>.del(\'#{_id}\')" class="scalable delete" type="button"><span><?php echo Mage::helper('adminhtml')->__('Delete') ?></span></button></td>'
+                + '</tr>'
+        );
     }
+    initRowTemplate();
 
-// initialize standalone button
+    var arrayRow<?php echo $_htmlId ?> = {
+        template : new Template(
+            '<tr id="#{_id}" class="simple-added-row">'
+            <?php foreach ($this->_columns as $columnName => $column): ?>
+            + '<td class="#{_id}-<?php echo $columnName ?>">'
+            + crconnectElements.stringElements['<?php echo $columnName; ?>']
+            + '</td>'
+            <?php endforeach; ?>
+            <?php if ($this->_addAfter): ?>
+            + '<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><?php echo Mage::helper('adminhtml')->__('Add after') ?></span></button></td>'
+            <?php endif; ?>
+            + '<td><button onclick="arrayRow<?php echo $_htmlId ?>.del(\'#{_id}\')" class="scalable delete" type="button"><span><?php echo Mage::helper('adminhtml')->__('Delete') ?></span></button></td>'
+            + '</tr>'
+        ),
+        rowsCount: 0,
+        add: function(templateData, insertAfterId) {
+            // generate default template data
+            if ('' == templateData) {
+                var d = new Date();
+                var templateData = {
+                    <?php foreach ($this->_columns as $columnName => $column): ?>
+                        <?php echo $columnName ?> : '',
+                    <?php endforeach; ?>
+                    _id : '_' + d.getTime() + '_' + d.getMilliseconds()
+                };
+            }
+            if ('' == insertAfterId) {
+                new Insertion.Before(
+                    $('addRow<?php echo $_htmlId ?>'),
+                    rowTemplate.evaluate(templateData)
+                );
+            } else {
+                new Insertion.After(
+                    $(insertAfterId),
+                    rowTemplate.evaluate(templateData)
+                );
+            }
+            <?php foreach ($this->_columns as $columnName => $column): ?>
+                var options = $$('td.' + templateData._id + '-' + '<?php echo $columnName ?>' + ' option')
+                for (var index = 0; index < options.length; ++index) {
+                    var option = options[index]
+                    if (option.getAttribute('value') == templateData.<?php echo $columnName ?>) {
+                        option.selected = true
+                        <?php if ($columnName == "crconnect"): ?>
+                        crconnectElements.editedSelects.push(templateData._id);
+                        <?php endif; ?>
+                    }
+                }
+            <?php endforeach; ?>
+            <?php if ($this->_addAfter): ?>
+                Event.observe('addAfterBtn' + templateData._id, 'click', this.add.bind(this, '', templateData._id));
+            <?php endif; ?>
+                this.rowsCount += 1;
+        },
+        del: function(rowId) {
+            $(rowId).remove();
+            this.rowsCount -= 1;
+            if (0 == this.rowsCount) {
+                this.showButtonOnly();
+            }
+        },
+        showButtonOnly: function() {
+            $('grid<?php echo $_htmlId ?>').hide();
+                $('empty<?php echo $_htmlId ?>').show();
+            }
+        }
+    <?php
+    $_addAfterId = "headings{$_htmlId}";
+    foreach ($this->getArrayRows() as $_rowId => $_row) {
+        echo "arrayRow{$_htmlId}.add(" . $_row->toJson() . ", '{$_addAfterId}');\n";
+        $_addAfterId = $_rowId;
+    }
+    ?>
+    function emptyAction()
+    {
+        $('grid<?php echo $_htmlId ?>').show();
+        $('empty<?php echo $_htmlId ?>').hide();
+        arrayRow<?php echo $_htmlId ?>.add('', '');
+    }
     $('empty<?php echo $_htmlId ?>').hide();
-//Event.observe('emptyAddBtn<?php echo $_htmlId ?>', 'click', function () {
-//    $('grid<?php echo $_htmlId ?>').show();
-//    $('empty<?php echo $_htmlId ?>').hide();
-//    arrayRow<?php echo $_htmlId ?>.add('', '');
-//});
-
-// if no rows, hide grid and show button only
-<?php if (!$this->getArrayRows()): ?>
-        arrayRow<?php echo $_htmlId ?>.showButtonOnly();
-<?php endif; ?>
-
-// toggle the grid, if element is disabled (depending on scope)
-<?php if ($this->getElement()->getDisabled()): ?>
-        toggleValueElements({checked:true}, $('grid<?php echo $_htmlId ?>').parentNode);
-<?php endif; ?>
+    //Event.observe('emptyAddBtn<?php echo $_htmlId ?>', 'click', function () {
+    //    $('grid<?php echo $_htmlId ?>').show();
+    //    $('empty<?php echo $_htmlId ?>').hide();
+    //    arrayRow<?php echo $_htmlId ?>.add('', '');
+    //});
+    <?php if (!$this->getArrayRows()): ?>
+    arrayRow<?php echo $_htmlId ?>.showButtonOnly();
+    <?php endif; ?>
+    <?php if ($this->getElement()->getDisabled()): ?>
+    toggleValueElements({checked:true}, $('grid<?php echo $_htmlId ?>').parentNode);
+    <?php endif; ?>
 // -->
 </script>

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Conlabz_CrConnect>
-            <version>3.0.6</version>
+            <version>3.1.5</version>
         </Conlabz_CrConnect>
     </modules>
     <global>
@@ -50,7 +50,7 @@
                         <method>trackingCodesSet</method>
                     </crconnect_customer_session_init>
                 </observers>
-            </customer_session_init> 
+            </customer_session_init>
             <checkout_onepage_controller_success_action>
                 <observers>
                     <crconnect_checkout_onepage_controller_success_action>
@@ -59,7 +59,7 @@
                         <method>checkoutSuccess</method>
                     </crconnect_checkout_onepage_controller_success_action>
                 </observers>
-            </checkout_onepage_controller_success_action>   
+            </checkout_onepage_controller_success_action>
             <sales_order_place_after>
                 <observers>
                     <crconnect_sales_order_place_after>
@@ -94,7 +94,7 @@
             <modules>
                 <Conlabz_CrConnect>
                     <files>
-                        <default>Conlabz_CleverReach.csv</default>
+                        <default>Conlabz_CrConnect.csv</default>
                     </files>
                 </Conlabz_CrConnect>
             </modules>
@@ -128,21 +128,21 @@
     </adminhtml>
     <admin>
         <routers>
-            <crconnect>
-                <use>admin</use>
-                <args>
-                    <module>Conlabz_CrConnect</module>
-                    <frontName>crconnect</frontName>
-                </args>
-            </crconnect>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Conlabz_CrConnect after="Mage_Adminhtml">Conlabz_CrConnect_Adminhtml</Conlabz_CrConnect>
+                    </modules>
+                </args>
+            </adminhtml>
         </routers>
-    </admin>    
+    </admin>
     <frontend>
         <translate>
             <modules>
                 <Conlabz_CrConnect>
                     <files>
-                        <default>Conlabz_CleverReach.csv</default>
+                        <default>Conlabz_CrConnect.csv</default>
                     </files>
                 </Conlabz_CrConnect>
             </modules>
@@ -155,6 +155,13 @@
                     </modules>
                 </args>
             </newsletter>
+            <crconnect>
+                <use>standard</use>
+                <args>
+                    <module>Conlabz_CrConnect</module>
+                    <frontName>crconnect</frontName>
+                </args>
+            </crconnect>
         </routers>
         <layout>
             <updates>
@@ -164,4 +171,11 @@
             </updates>
         </layout>
     </frontend>
+    <phpunit>
+        <suite>
+            <modules>
+                <Conlabz_CrConnect />
+            </modules>
+        </suite>
+    </phpunit>
 </config>

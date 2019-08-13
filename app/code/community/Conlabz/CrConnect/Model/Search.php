@@ -2,13 +2,11 @@
 
 class Conlabz_CrConnect_Model_Search
 {
-    /*
+    /**
      * Get Search Filters values
      */
-
     public function getFilter()
     {
-
         $filter = array();
 
         // Generate Categories Filter
@@ -41,41 +39,36 @@ class Conlabz_CrConnect_Model_Search
         return $filter;
     }
 
-    /*
-     * Get categories tree recurcively function 
+    /**
+     * Get categories tree recurcively function
      *
      * @return array of categories of one level
      */
-
     public function getCategories($categories)
     {
-
+        $array = array();
         foreach ($categories as $category) {
-            $cat = Mage::getModel('catalog/category')->load($category->getId());
             $prefix = "";
             for ($i = 0; $i < $category->getLevel() - 2; $i++) {
                 $prefix .= "&nbsp;";
             }
             $array[] = array("text" => $prefix . $category->getName(), "value" => $category->getId()); //In this line we get an a link for the product and product count of that category
             if ($category->hasChildren()) {
-                $children = Mage::getModel('catalog/category')->getCategories($category->getId()); // $children get a list of all subcategories
+                $children = $category->getChildrenCategories(); // $children get a list of all subcategories
                 $array = array_merge($array, $this->getCategories($children)); //recursive call the get_categories function again.
             }
         }
         return $array;
     }
 
-    /*
+    /**
      * Get Search result
      *
      * @param int category - category ID
-     * @param string product - part of name or description
-     *
+     * @param array
      */
-
     public function getSearch($category = false, $product = "", $store = false)
     {
-
         $products = Mage::getModel('catalog/product')->getCollection()
                 ->addAttributeToSelect("name")
                 ->addAttributeToSelect("description")

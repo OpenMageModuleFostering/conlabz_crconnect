@@ -4,6 +4,9 @@
         <Conlabz_CrConnect>
             <active>true</active>
             <codePool>community</codePool>
+            <depends>
+                <Mage_Newsletter />
+            </depends>
         </Conlabz_CrConnect>
     </modules>
 </config> 
