@@ -98,16 +98,17 @@ class Conlabz_CrConnect_Model_Observer{
     }
     public function checkoutSuccess($observer){
         
-        $event = $observer->getEvent();
-        
-        $apiKey = trim(Mage::getStoreConfig('crroot/crconnect/api_key'));
-        $listID = trim(Mage::getStoreConfig('crroot/crconnect/list_id'));
+        if (!Mage::registry('order_track_start')){
+            Mage::register('order_track_start', true);
+        }else{
+            return true;
+        }
         
         if(Mage::helper("crconnect")->isTrackingEnabled())
             $lastOrderId = Mage::getSingleton('checkout/session')->getLastOrderId();
         else{
-            $lastOrderId = false;
             Mage::helper("crconnect")->log("CleverReach_CrConnect: order sycing deactivated");
+            return false;
         }
         
         $order = Mage::getModel('sales/order')->load($lastOrderId);
@@ -141,6 +142,78 @@ class Conlabz_CrConnect_Model_Observer{
             }
             
         }   	
+               	
+    }
+    public function orderPlacedAfter($observer){
+        try{
+            
+            $order = $observer->getOrder();
+
+            if(Mage::helper("crconnect")->isM2eExclude()){
+                
+                $shippingMethod = $order->getShippingMethod();
+                Mage::helper("crconnect")->log("M2E sync disabled -> shipping method: ".$shippingMethod);
+                    
+                if (in_array($shippingMethod, Mage::helper("crconnect")->getM2eShippingMethods())){
+                    Mage::helper("crconnect")->log("Its M2E order -> Skip");
+                    return true;
+                }
+                
+            }
+                     
+            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+            $email = $order->getCustomerEmail();
+
+            if(Mage::helper("crconnect")->isForceSyncEnabled()){
+
+                Mage::helper("crconnect")->log("Force sync orders enabled");
+
+                if($customer->getEmail()){
+                    Mage::helper("crconnect")->log("Force sync orders for logged in customer");
+                    $crReceiver = Mage::helper('crconnect')->prepareUserdata($customer);
+                    $result = Mage::getModel("crconnect/api")->receiverAdd($crReceiver, $customer->getGroupId());
+                    Mage::helper("crconnect")->log($result);
+                }else{
+                    Mage::helper("crconnect")->log("Force sync orders for guest customer");
+                    $billingAddress = $order->getBillingAddress()->getData();
+                    if($billingAddress){
+                        Mage::helper("crconnect")->log("Prepare info based on billing address");
+                        $crReceiver = array (
+                            'email' => $email,
+                            'source' => 'MAGENTO',
+                            'attributes' => array(
+                                0 => array("key" => "firstname", "value" => $billingAddress["firstname"]),
+                                1 => array("key" => "lastname", "value" => @$billingAddress["lastname"]),
+                                2 => array("key" => "street", "value" => @$billingAddress["street"]),
+                                3 => array("key" => "zip", "value" => @$billingAddress["postcode"]),
+                                4 => array("key" => "city", "value" => @$billingAddress["city"]),
+                                5 => array("key" => "country", "value" => @$billingAddress["country_id"]),
+                                6 => array("key" => "salutation", "value" => @$billingAddress["prefix"]),
+                                7 => array("key" => "title", "value" => @$billingAddress["suffix"]),
+                                8 => array("key" => "company", "value" => @$billingAddress["company"]))
+                        );
+
+                        $cookie = Mage::getSingleton('core/cookie');
+                        if ($cookie->get('crmailing')){
+                            $crReceiver['orders'][0]['mailings_id'] = $cookie->get('crmailing');
+                        }
+                        Mage::helper("crconnect")->log($crReceiver);
+
+                        $result = Mage::getModel("crconnect/api")->receiverAdd($crReceiver);
+                        Mage::helper("crconnect")->log($result);
+
+                    }
+                }  
+
+            }
+    
+        } catch (Exception $ex) {
+            Mage::helper("crconnect")->log("order_save_after Exception");
+            Mage::helper("crconnect")->log($ex);
+        }
+
+        return true;
+        
     }
     
     public function customerDeleted($observer){

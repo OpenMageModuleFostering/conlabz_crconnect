@@ -70,8 +70,9 @@
 "%s Subscription","%s Abonnement"
 "You are currently subscribed to '%s Subscription'","Sie sind momentan für das Abo '%s' eingetragen."
 "Magento users who subscribe/unsubscribe to the newsletter will be added/removed from this CleverReach receiver list.","Shop-Kunden welche sich beim Newsletter an- oder abmelden, werden in dieser CleverReach-Empfängerliste ein- oder ausgetragen."
-
-
-
-
+"Force synchronization of order Email addresses","Synchronisation der E-Mailadressen erzwingen"
+"Emails from customers orders will be synchronized with CleverReach (even if they are not subscribed)","E-Mailadressen von Bestellungen werden mit Cleverreach synchronisiert (auch von nicht angemeldeten Kunden)."
+"Enable M2E compatibility","Aktiviere M2E-Kompatibilität."
+"Exclude eBay/Amazon orders from force synchronization","Ebay-/Amazon-Bestellungen von Synchronisation ausschließen."
+"Enable Double Opt-in","Double Opt-in Aktivieren"
 

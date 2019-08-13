@@ -7,6 +7,9 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
     const XML_LIST_ID_CONFIG_PATH = "crroot/crconnect/list_id";
     const XML_FORM_ID_CONFIG_PATH = "crroot/crconnect/form_id";
     const XML_SYNC_ORDERS_CONFIG_PATH = "crroot/crconnect/sync_orders";
+    const XML_SYNC_ORDERS_EMAILS_CONFIG_PATH = "crroot/crconnect/sync_orders_emails";
+    const XML_SYNC_ORDERS_M2E_PATH = "crroot/crconnect/m2e_sync";
+    
     const XML_GROUP_SEPARATION_CONFIG_PATH = "crroot/crconnect/auto_separate";
     const XML_GROUP_KEYS = "crroot/crconnect/groups_keys";
     const XML_PATH_LOGGED_CONFIRM_EMAIL_TEMPLATE = 'crroot/crconnect/confirm_newsletter_logged';
@@ -44,6 +47,12 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         return $this->getConfigForStore(self::XML_FEED_PASSWORD);
     }
     
+    /*
+     * Is exclude M2E orders from sync
+     */
+    public function isM2eExclude(){
+        return $this->getConfigForStore(self::XML_SYNC_ORDERS_M2E_PATH);
+    }
     /*
      * Check if Douple Opt In enabled
      */
@@ -125,6 +134,13 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
 
         Mage::log($message, null, "crconnect.log", true);
     }
+    
+    /*
+     * Get if sync order emails enabled
+     */
+    public function isForceSyncEnabled(){
+        return Mage::getStoreConfig(self::XML_SYNC_ORDERS_EMAILS_CONFIG_PATH);
+    }
 
     /*
      * Get groups keys json value from system settings
@@ -201,7 +217,6 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
                 return false;
             }
         }
-
         return $keysArray;
     }
     
@@ -363,5 +378,10 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         }
         return false;
         
+    }
+    public function getM2eShippingMethods(){
+        
+        return array("m2eproshipping_m2eproshipping");
+
     }
 }

@@ -146,7 +146,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         if ($groupId == 0) {
             $listId = $this->_helper->getDefaultListId();
         } else {
-            $listId = $this->_helper->getGroupsIds($groupId);
+            $listId = $this->_helper->getGroupsIds($groupId, true);
         }
         return $listId;
     }
@@ -328,7 +328,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         $listId = $this->_helper->getDefaultListId();
         $result = $this->_client->receiverAddOrder($this->_apiKey, $listId, $email, $orderInfo);
         Mage::helper("crconnect")->log("CALL receiverAddOrder: ".$email);    
-        Mage::helper("crconnect")->log($result->message);    
+        Mage::helper("crconnect")->log($orderInfo);    
+        Mage::helper("crconnect")->log($result);    
         if ($result->status == self::SUCCESS_STATUS) {
             return true;
         } else {
