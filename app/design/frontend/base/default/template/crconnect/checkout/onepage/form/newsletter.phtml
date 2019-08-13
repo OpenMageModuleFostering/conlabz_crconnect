@@ -24,6 +24,13 @@
 //<![CDATA[
     //newsletterForm = new VarienForm('form-validate', false);
     //move fieldset into form to get data send via review.save() later on
-    $('checkout-agreements').insert({top: $('crconnect-checkout-subscription')});
+    var form = $('checkout-agreements');
+
+    if (!form) {
+    	form = new Element('form', {action: '', id: 'checkout-agreements', onsubmit: 'return false;'});
+        $('checkout-step-review').insert({top: form});
+    }
+
+    form.insert({top: $('crconnect-checkout-subscription')});
 //]]>
 </script>

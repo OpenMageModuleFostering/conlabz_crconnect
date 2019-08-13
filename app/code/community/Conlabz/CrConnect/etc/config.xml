@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Conlabz_CrConnect>
-            <version>3.3.2</version>
+            <version>3.3.7</version>
         </Conlabz_CrConnect>
     </modules>
     <global>
@@ -67,11 +67,11 @@
                         <class>crconnect/observer</class>
                         <method>orderPlacedAfter</method>
                     </crconnect_sales_order_place_after>
-                    <crconnect_checkout_subscription>
+                    <!-- crconnect_checkout_subscription>
                         <type>singleton</type>
                         <class>crconnect/observer</class>
                         <method>checkoutSubscription</method>
-                    </crconnect_checkout_subscription>
+                    </crconnect_checkout_subscription -->
                 </observers>
             </sales_order_place_after>
             <customer_delete_before>

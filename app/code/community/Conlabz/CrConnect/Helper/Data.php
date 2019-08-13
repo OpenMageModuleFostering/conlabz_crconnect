@@ -362,7 +362,7 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract
                     $crOrder["product_id"] = $item->getProductId();
                     $crOrder["price"] = round($item->getPrice(), 2);
                     $crOrder["quantity"] = (integer)$item->getQtyOrdered();
-                    $crOrder["purchase_date"] = time();
+                    $crOrder["purchase_date"] = strtotime($item->getCreatedAt());
                     $crOrder["currency"] = $order->getData('order_currency_code');
                     $crOrder["source"] = "MAGENTO Order";
 
