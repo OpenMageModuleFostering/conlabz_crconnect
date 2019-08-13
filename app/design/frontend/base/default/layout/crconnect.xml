@@ -23,4 +23,11 @@
 
     </customer_account_index>
 
+    <checkout_onepage_review>
+        <reference name="checkout.onepage.review.info.items.after">
+            <block type="crconnect/customer_newsletter" name="checkout_newsletter" template="crconnect/checkout/onepage/form/newsletter.phtml">
+            </block>
+        </reference>
+    </checkout_onepage_review>
+
 </layout>

@@ -1,0 +1,29 @@
+<?php if (!$this->checkoutSubscriptionActive()) return; ?>
+<?php
+    $groupId = Mage::getSingleton('customer/session')->getCustomerGroupId();
+    $groupName = Mage::getModel('customer/group')->load($groupId)->getCode();
+    $isMultiply = Mage::helper("crconnect")->getGroupsIds($groupId);
+?>
+<fieldset>
+<?php echo $this->getBlockHtml('formkey') ?>
+        <ul id="crconnect-checkout-subscription" class="form-list">
+        <label><?= $this->__('Subscribe to newsletter') ?></label>
+        <?php if ($this->isDefaultGroupUser()) { ?>
+                <?php if (!Mage::helper('crconnect')->isShowDefaultGroup() || !$isMultiply) { ?>
+                    <li class="control"><input type="checkbox" name="is_subscribed" id="subscription" value="1" title="<?php echo $this->__('General Subscription') ?>"<?php if ($this->isDefaultSubscribed()): ?> checked="checked"<?php endif; ?> class="checkbox" /><label for="subscription"><?php echo $this->__('General Subscription') ?></label></li>
+                <?php } ?>
+                <?php if ($isMultiply) { ?>
+                    <li class="control"><input type="checkbox" name="is_gsubscribed" id="gsubscription" value="1" title="<?php echo $groupName ?> Abonnement"<?php if ($this->isCustomSubscribed()): ?> checked="checked"<?php endif; ?> class="checkbox" /><label for="gsubscription"><?php echo Mage::helper('crconnect')->__('%s Subscription', $groupName) ?> </label></li>
+                <?php } ?>
+            <?php }else { ?>
+                <li class="control"><input type="checkbox" name="is_subscribed" id="subscription" value="1" title="<?php echo $this->__('General Subscription') ?>"<?php if ($this->isDefaultSubscribed()): ?> checked="checked"<?php endif; ?> class="checkbox" /><label for="subscription"><?php echo $this->__('General Subscription') ?></label></li>
+            <?php } ?>
+        </ul>
+</fieldset>
+<script type="text/javascript">
+//<![CDATA[
+    //newsletterForm = new VarienForm('form-validate', false);
+    //move fieldset into form to get data send via review.save() later on
+    $('checkout-agreements').insert({top: $('crconnect-checkout-subscription')});
+//]]>
+</script>

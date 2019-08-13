@@ -44,4 +44,10 @@ class Conlabz_CrConnect_Block_Customer_Newsletter extends Mage_Customer_Block_Ne
     {
         return $this->getUrl('*/*/save', array('_secure' => Mage::app()->getStore()->isCurrentlySecure()));
     }
+
+    public function checkoutSubscriptionActive()
+    {
+        $checkoutSubscriptionActive = Mage::getStoreConfigFlag('crroot/crconnect/checkout_subscription');
+        return $checkoutSubscriptionActive;
+    }
 }

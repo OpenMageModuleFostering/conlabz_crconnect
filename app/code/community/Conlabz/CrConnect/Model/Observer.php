@@ -117,6 +117,15 @@ class Conlabz_CrConnect_Model_Observer
         }
     }
 
+    public function checkoutSubscription(Varien_Event_Observer $observer)
+    {
+        //$event = $observer->getEvent();
+        $request = Mage::app()->getRequest();
+        /** @var $subscriber Conlabz_CrConnect_Model_Subscriber */
+        $subscriber = Mage::getModel("crconnect/subscriber");
+        $subscriber->updateSubscription($request);
+    }
+
     public function orderPlacedAfter($observer)
     {
         try {
@@ -169,6 +178,9 @@ class Conlabz_CrConnect_Model_Observer
                         Mage::helper("crconnect")->log($crReceiver);
 
                         $result = Mage::getModel("crconnect/api")->receiverAdd($crReceiver);
+                        if ($result->status !== 'SUCCESS') {
+                            $result = Mage::getModel("crconnect/api")->receiverUpdate($crReceiver);
+                        }
                         Mage::helper("crconnect")->log($result);
                     }
                 }

@@ -169,10 +169,10 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
     {
         $listId = $this->getGroupKey($groupId);
 
-        $this->_helper->log("CALL: receiverAdd");
+        $this->_helper->log("CALL: receiverUpdate");
         $this->_helper->log($customerData);
 
-        return $this->_client->receiverAdd($this->_apiKey, $listId, $customerData);
+        return $this->_client->receiverUpdate($this->_apiKey, $listId, $customerData);
     }
 
     /**
@@ -182,7 +182,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
     public function receiverSetInactive($email, $groupId = 0)
     {
         $listId = $this->getGroupKey($groupId);
-        $this->_helper->log("CALL: receiverSetInactive - Email".$email." | GroupId:". $groupId);
+        $this->_helper->log("CALL: receiverSetInactive - Email: ".$email." | GroupId: ". $groupId);
         return $this->_client->receiverSetInactive($this->_apiKey, $listId, $email);
 
     }
@@ -196,7 +196,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
     public function receiverSetActive($email, $groupId = 0)
     {
         $listId = $this->getGroupKey($groupId);
-        $this->_helper->log("CALL: receiverSetActive - Email".$email." | GroupId:". $groupId);
+        $this->_helper->log("CALL: receiverSetActive - Email: ".$email." | GroupId: ". $groupId);
         return $this->_client->receiverSetActive($this->_apiKey, $listId, $email);
     }
 
