@@ -585,7 +585,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
         $groupDetails = $this->_client->groupGetDetails($this->_apiKey, $listId);
         
         if ($groupDetails->status !== self::SUCCESS_STATUS) {
-            $this->_helper->log("CleverReach Connection Error: " . $groupDetails);
+            $this->_helper->log("CleverReach Connection Error: " . $groupDetails->message);
             return $groupDetails;
         }
         
