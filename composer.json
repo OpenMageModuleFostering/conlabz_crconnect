@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/Conlabz_CrConnect",
+    "type": "magento-module",
+    "license": "GNU-General-Public-License",
+    "homepage": "",
+    "description": "Synchronizes your Magento subscribers, customers and sales with CleverReach Email Marketing Software.",
+    "authors": [
+    {
+        "name": "conlabz GmbH",
+        "email": "info@conlabz.de"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
