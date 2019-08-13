@@ -29,4 +29,10 @@ class Conlabz_CrConnect_Model_Subscriber extends Mage_Core_Model_Abstract {
         
     }
     
+    public function updateCustomer($customer, $groupId = 0){
+        
+        return Mage::getModel("crconnect/api")->update($customer, $groupId);
+        
+    }
+    
 }

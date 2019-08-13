@@ -21,6 +21,9 @@ class Conlabz_CrConnect_Model_Observer{
         $customer = $observer->getCustomer();
         
         $email = $customer->getEmail();    
+        
+        Mage::getModel("crconnect/subscriber")->updateCustomer($customer);
+        
         $subscriber = Mage::getModel("newsletter/subscriber")->loadByEmail($email);
         $subscriber->setEmail($email);
         if (Mage::app()->getStore()->isAdmin()){

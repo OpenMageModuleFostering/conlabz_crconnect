@@ -75,6 +75,34 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         return false;
     }
     
+    public function update($customer = false, $groupId = 0){
+        
+        if ($this->isConnected()){
+            
+            if (!$customer) {
+                $customer = Mage::getSingleton('customer/session')->getCustomer();
+            }
+            $crReceiver = $this->_helper->prepareUserdata($customer);
+            $updateResult = $this->receiverUpdate($crReceiver, $customer->getGroupId());
+            if ($updateResult->status == self::SUCCESS_STATUS) {
+                
+                $this->_helper->log($this->_helper->__("CALL: receiverUpdate - SUCCESS"));
+                $this->_helper->log($crReceiver);
+                $this->_helper->log("receiverUpdate: GroupId: ".$customer->getGroupId());
+
+                return true;
+            } else {
+                
+                $this->_helper->log($this->_helper->__("CALL: receiverUpdate - FAIL"));
+            
+            }
+            return true;
+            
+        }
+        return false;
+        
+    }
+    
     public function unsubscribe($email = false, $groupId = 0) {
 
         if ($this->isConnected() && $email){
@@ -127,6 +155,20 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Subscriber simple user to special group
      */
     public function receiverAdd($customerData, $groupId = 0) {
+
+        $listId = $this->getGroupKey($groupId);
+        
+        $this->_helper->log("CALL: receiverAdd");
+        $this->_helper->log($customerData);
+        
+        return $this->_client->receiverAdd($this->_apiKey, $listId, $customerData);
+    
+    }
+    
+    /*
+     * Update simple user
+     */
+    public function receiverUpdate($customerData, $groupId = 0) {
 
         $listId = $this->getGroupKey($groupId);
         
