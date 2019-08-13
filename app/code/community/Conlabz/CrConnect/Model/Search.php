@@ -1,11 +1,13 @@
 <?php
 
-class Conlabz_CrConnect_Model_Search {
+class Conlabz_CrConnect_Model_Search
+{
     /*
      * Get Search Filters values
      */
 
-    public function getFilter() {
+    public function getFilter()
+    {
 
         $filter = array();
 
@@ -45,7 +47,8 @@ class Conlabz_CrConnect_Model_Search {
      * @return array of categories of one level
      */
 
-    public function getCategories($categories) {
+    public function getCategories($categories)
+    {
 
         foreach ($categories as $category) {
             $cat = Mage::getModel('catalog/category')->load($category->getId());
@@ -70,7 +73,8 @@ class Conlabz_CrConnect_Model_Search {
      *
      */
 
-    public function getSearch($category = false, $product = "", $store = false) {
+    public function getSearch($category = false, $product = "", $store = false)
+    {
 
         $products = Mage::getModel('catalog/product')->getCollection()
                 ->addAttributeToSelect("name")
@@ -99,7 +103,6 @@ class Conlabz_CrConnect_Model_Search {
         $items = array();
         if ($category || $product) {
             foreach ($products as $product) {
-
                 $item = array();
                 $item['title'] = $product->getName();
                 $item['description'] = $product->getDescription();
@@ -114,5 +117,4 @@ class Conlabz_CrConnect_Model_Search {
         $search['items'] = $items;
         return $search;
     }
-
 }

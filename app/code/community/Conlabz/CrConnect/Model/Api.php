@@ -1,23 +1,26 @@
 <?php
 
-class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
+class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
+{
 
     const SUCCESS_STATUS = "SUCCESS";
     
     const ERROR_CODE_DUPLICATED = 50;
     const ERROR_CODE_INVALID = 40;
     
-    public function __construct() {
+    public function __construct()
+    {
         
         $this->init();
     
     }
 
-    public function init($storeId = false){
+    public function init($storeId = false)
+    {
         
         $this->_helper = Mage::helper('crconnect');
         
-        if ($storeId){
+        if ($storeId) {
             $this->_helper->log($this->_helper->__("SET Helper Store: ". $storeId));
             $this->_helper->setCurrentStoreId($storeId);
         }
@@ -32,7 +35,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Get Connection to CrConnect
      */
 
-    public function getSoapClient() {
+    public function getSoapClient()
+    {
 
         try {
             $client = new SoapClient($this->_helper->getWsdl(), array("trace" => true, "exception" => 0));
@@ -46,24 +50,22 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     }
     
     
-    public function subscribe($customer = false, $groupId = 0) {
+    public function subscribe($customer = false, $groupId = 0)
+    {
 
-        if ($this->isConnected()){
-            
+        if ($this->isConnected()) {
             if (!$customer) {
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
             }
             $crReceiver = $this->_helper->prepareUserdata($customer, array('newsletter' => 1));
             $addResult = $this->receiverAdd($crReceiver, $groupId);
             if ($addResult->status == self::SUCCESS_STATUS) {
-                
                 $this->_helper->log($this->_helper->__("CALL: receiverAdd - SUCCESS"));
                 $this->_helper->log($crReceiver);
                 $this->_helper->log("receiverAdd: GroupId: ".$groupId);
 
                 return true;
             } else {
-                
                 $this->_helper->log($this->_helper->__("CALL: receiverAdd - FAIL, then call receiverSetActive:".$customer->getEmail()));
                 $this->_helper->log("receiverSetActive: GroupId: ".$groupId);
 
@@ -75,24 +77,22 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         return false;
     }
     
-    public function update($customer = false, $groupId = 0){
+    public function update($customer = false, $groupId = 0)
+    {
         
-        if ($this->isConnected()){
-            
+        if ($this->isConnected()) {
             if (!$customer) {
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
             }
             $crReceiver = $this->_helper->prepareUserdata($customer);
             $updateResult = $this->receiverUpdate($crReceiver, $customer->getGroupId());
             if ($updateResult->status == self::SUCCESS_STATUS) {
-                
                 $this->_helper->log($this->_helper->__("CALL: receiverUpdate - SUCCESS"));
                 $this->_helper->log($crReceiver);
                 $this->_helper->log("receiverUpdate: GroupId: ".$customer->getGroupId());
 
                 return true;
             } else {
-                
                 $this->_helper->log($this->_helper->__("CALL: receiverUpdate - FAIL"));
             
             }
@@ -103,10 +103,10 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         
     }
     
-    public function unsubscribe($email = false, $groupId = 0) {
+    public function unsubscribe($email = false, $groupId = 0)
+    {
 
-        if ($this->isConnected() && $email){
-            
+        if ($this->isConnected() && $email) {
             $result = $this->receiverSetInactive($email, $groupId);
             if ($result->status == self::SUCCESS_STATUS) {
                 $this->_helper->log($this->_helper->__("CALL: receiverSetInactive - SUCCESS, Email:".$email." | GroupId:".$groupId));
@@ -121,9 +121,10 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Check if connection was successfull 
      */
 
-    public function isConnected() {
+    public function isConnected()
+    {
 
-        if ($this->_client !== false && $this->_client !== NULL) {
+        if ($this->_client !== false && $this->_client !== null) {
             return true;
         }
         return false;
@@ -133,7 +134,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * If Account have more then 1 group
      */
 
-    public function isMultyGroups() {
+    public function isMultyGroups()
+    {
 
         if (is_array($this->_groupsListIds) && sizeof($this->_groupsListIds) > 0) {
             return true;
@@ -141,7 +143,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         return false;
     }
     
-    public function getGroupKey($groupId){
+    public function getGroupKey($groupId)
+    {
         
         if ($groupId == 0) {
             $listId = $this->_helper->getDefaultListId();
@@ -154,7 +157,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     /*
      * Subscriber simple user to special group
      */
-    public function receiverAdd($customerData, $groupId = 0) {
+    public function receiverAdd($customerData, $groupId = 0)
+    {
 
         $listId = $this->getGroupKey($groupId);
         
@@ -168,7 +172,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     /*
      * Update simple user
      */
-    public function receiverUpdate($customerData, $groupId = 0) {
+    public function receiverUpdate($customerData, $groupId = 0)
+    {
 
         $listId = $this->getGroupKey($groupId);
         
@@ -182,7 +187,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     /*
      * Deactivates a given receiver/email
      */
-    public function receiverSetInactive($email, $groupId = 0) {
+    public function receiverSetInactive($email, $groupId = 0)
+    {
 
         $listId = $this->getGroupKey($groupId);
         $this->_helper->log("CALL: receiverSetInactive - Email".$email." | GroupId:". $groupId);
@@ -190,7 +196,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     
     }
     
-    public function receiverSetActive($email, $groupId = 0) {
+    public function receiverSetActive($email, $groupId = 0)
+    {
 
         $listId = $this->getGroupKey($groupId);
         $this->_helper->log("CALL: receiverSetActive - Email".$email." | GroupId:". $groupId);
@@ -208,7 +215,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * @return array - result
      */
 
-    private function returnResult($result, $fail = false) {
+    private function returnResult($result, $fail = false)
+    {
 
         $return = array();
         $return['error'] = $fail;
@@ -220,13 +228,13 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Get user account details
      */
 
-    public function clientGetDetails() {
+    public function clientGetDetails()
+    {
 
         $result = $this->_client->clientGetDetails($this->_apiKey);
         if ($result->status == self::SUCCESS_STATUS) {
             return $this->returnResult($result->data);
         } else {
-
             $this->_helper->log($this->_helper->__("CALL: clientGetDetails - failed"));
             $this->_helper->log($result->message);
             
@@ -238,7 +246,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Get Group Information
      */
 
-    public function groupGetStats($groupId = false) {
+    public function groupGetStats($groupId = false)
+    {
 
         if (!$groupId) {
             $groupId = $this->_helper->getDefaultListId();
@@ -248,11 +257,10 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         if ($result->status == self::SUCCESS_STATUS) {
             return $this->returnResult($result->data);
         } else {
-
             $this->_helper->log($this->_helper->__("CALL: groupGetStats - failed. List ID: ".$groupId));
             $this->_helper->log($this->_helper->__($result->message));
             
-            if ($groupId){
+            if ($groupId) {
                 return $this->returnResult($result->data, $this->_helper->__("Your list ID (%s) seem to be wrong. Please select other group!", $groupId));
             }
             return $this->returnResult($result->data, $this->_helper->__("Please set your CleverReach user group in Extension settings section."));
@@ -263,7 +271,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Get Group Information
      */
 
-    public function groupGetDetails($listId = false) {
+    public function groupGetDetails($listId = false)
+    {
 
         if (!$listId) {
             $listId = $this->_helper->getDefaultListId();
@@ -271,14 +280,12 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
 
         $result = $this->_client->groupGetDetails($this->_apiKey, $listId);
         if ($result->status == self::SUCCESS_STATUS) {
-
             return $this->returnResult($result->data);
         } else {
-
             $this->_helper->log($this->_helper->__("CALL: groupGetDetails - failed. List ID: ".$listId));
             $this->_helper->log($this->_helper->__($result->message));
             
-            if ($listId){
+            if ($listId) {
                 return $this->returnResult($result->data, $this->_helper->__("Your list ID (%s) seem to be wrong. Please select other group!", $listId));
             }
             return $this->returnResult($result->data, $this->_helper->__("Please set your CleverReach user group in Extension settings section."));
@@ -295,7 +302,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * @return int amount of synced users
      */
 
-    public function receiverAddBatch($batch, $groupId = 0) {
+    public function receiverAddBatch($batch, $groupId = 0)
+    {
 
         if ($groupId == 0) {
             $listId = $this->_helper->getDefaultListId();
@@ -308,13 +316,11 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         
         $result = $this->_client->receiverAddBatch($this->_apiKey, $listId, $batch);
         if ($result->status == self::SUCCESS_STATUS) {
-            
             $this->_helper->log("CrConnect: receiverAddBatch - SUCCESS.");
             $this->_helper->log("CrConnect: receiverAddBatch - key:".$this->_apiKey." | listId:".$listId);
             
             return count($batch);
         } else {
-
             $this->_helper->log("CrConnect: receiverAddBatch - FAIL.");
             $this->_helper->log("CrConnect: receiverAddBatch - key:".$this->_apiKey." | listId:".$listId);
             $this->_helper->log("CrConnect: receiverAddBatch - message:".$result->message);
@@ -323,13 +329,14 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         }
     }
 
-    public function receiverAddOrder($email, $orderInfo){
+    public function receiverAddOrder($email, $orderInfo)
+    {
         
         $listId = $this->_helper->getDefaultListId();
         $result = $this->_client->receiverAddOrder($this->_apiKey, $listId, $email, $orderInfo);
-        Mage::helper("crconnect")->log("CALL receiverAddOrder: ".$email);    
-        Mage::helper("crconnect")->log($orderInfo);    
-        Mage::helper("crconnect")->log($result);    
+        Mage::helper("crconnect")->log("CALL receiverAddOrder: ".$email);
+        Mage::helper("crconnect")->log($orderInfo);
+        Mage::helper("crconnect")->log($result);
         if ($result->status == self::SUCCESS_STATUS) {
             return true;
         } else {
@@ -346,7 +353,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * @return bool true|false
      */
 
-    public function isSubscribed($email, $groupId = 0) {
+    public function isSubscribed($email, $groupId = 0)
+    {
 
         if ($groupId == 0) {
             $listId = $this->_helper->getDefaultListId();
@@ -356,7 +364,6 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
 
         $result = $this->_client->groupGetDetails($this->_apiKey, $listId);
         if ($result->status == self::SUCCESS_STATUS) {
-
             $result = $this->_client->receiverGetByEmail($this->_apiKey, $listId, $email);
             if ($result->status == self::SUCCESS_STATUS && $result->data->active) {
                 return true;
@@ -368,12 +375,13 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     /*
      * get groups for API key
      */
-    public function getGroupsForKey($apiKey){
+    public function getGroupsForKey($apiKey)
+    {
         
         $result = $this->_client->groupGetList($apiKey);
         if ($result->status == self::SUCCESS_STATUS) {
-            return $result->data;   
-        }else{
+            return $result->data;
+        } else {
             return false;
         }
         
@@ -382,21 +390,22 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
     /*
      * get groups for API key
      */
-    public function getFormsForGroup($apiKey, $groupId){
+    public function getFormsForGroup($apiKey, $groupId)
+    {
         
         $result = $this->_client->formsGetList($apiKey, $groupId);
         if ($result->status == self::SUCCESS_STATUS) {
-            return $result->data;   
-        }else{
+            return $result->data;
+        } else {
             return false;
         }
         
     }
     
-    public function formsSendActivationMail($customer, $groupId = 0){
+    public function formsSendActivationMail($customer, $groupId = 0)
+    {
         
-        if ($this->isConnected()){
-            
+        if ($this->isConnected()) {
             // if not customer transfered, get current one from session
             if (!$customer) {
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
@@ -415,7 +424,6 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
             );
             
             if ($addResult->status == self::SUCCESS_STATUS) {
-                
                 // Send activation email for customer
                 $formId = $this->_helper->getFormsIds($groupId, true);
                 $result = $this->_client->formsSendActivationMail($this->_apiKey, $formId, $customer->getEmail(), $doidata);
@@ -424,33 +432,27 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
                     return true;
                 }
 
-            }else{
-                
+            } else {
                 $this->_helper->log("during formsSendActivationMail :: receiverAdd :: ERROR");
                 $this->_helper->log($addResult);
 
-                if ($addResult->statuscode == self::ERROR_CODE_DUPLICATED){
-                    
-                    if ($addResult->data->deactivated == 1){
-        
-                            
+                if ($addResult->statuscode == self::ERROR_CODE_DUPLICATED) {
+                    if ($addResult->data->deactivated == 1) {
                         // Send activation email for customer
                         $formId = $this->_helper->getFormsIds($groupId, true);
                         $result = $this->_client->formsSendActivationMail($this->_apiKey, $formId, $customer->getEmail(), $doidata);
                         if ($result->status == self::SUCCESS_STATUS) {
                             return true;
-                        }else{
-                            
+                        } else {
                             $this->_helper->log("during formsSendActivationMail :: formsSendActivationMail :: ERROR");
                             $this->_helper->log($result->message);
                             
-                            if ($result->statuscode == self::ERROR_CODE_INVALID){
+                            if ($result->statuscode == self::ERROR_CODE_INVALID) {
                                 Mage::getSingleton("core/session")->addError($this->_helper->__("This Email blocked or wrong"));
                             }
-                        }    
+                        }
                         
-                    }else{
-                        
+                    } else {
                         Mage::getSingleton("core/session")->addError($this->_helper->__("This Email already in our database"));
                         
                     }
@@ -469,7 +471,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
      * Sync data between Magento and Cleverreach
      */
 
-    public function synchronize() {
+    public function synchronize()
+    {
 
         //Check if we connected to Cr account
         if (!$this->isConnected()) {
@@ -486,7 +489,6 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         $i = 0;
 
         foreach ($subscribers as $subscriber) {
-
             $userGroup = 0;
 
             // If we should separate customers to different groups, then get customer Groups iD if exists
@@ -501,10 +503,9 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
             }
             
             
-            if (isset($subscriber['customer_id']) && $subscriber['customer_id']){
+            if (isset($subscriber['customer_id']) && $subscriber['customer_id']) {
                 $tmp = $this->_helper->prepareUserdata(Mage::getModel("customer/customer")->load($subscriber['customer_id']));
-            }else{
-            
+            } else {
                 $tmp["email"] = $subscriber["subscriber_email"];
                 $tmp["source"] = "MAGENTO";
 
@@ -515,7 +516,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
                     2 => array("key" => "newsletter", "value" => "1")
                 );
             
-            }     
+            }
             
             // Separate users by Batch, 25 users in one
             if ($tmp["email"]) {
@@ -524,19 +525,14 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         }
 
         try {
-
-            // send subscribers batch to CleverReach	
+            // send subscribers batch to CleverReach
             if ($batch) {
-
                 foreach ($batch as $storeId => $groupBatch) {
-
                     $this->init($storeId);
                     
-                    // send for each group	
+                    // send for each group
                     foreach ($groupBatch as $groupId => $batchStore) {
-
                         foreach ($batchStore as $part) {
-
                             $this->_helper->log("SYNCHRONIZATION - receiverAddBatch");
 
                             $result = $this->receiverAddBatch($part, $groupId);
@@ -563,7 +559,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         return $synced_users;
     }
     
-    public function setupDefaultClereReachList(){
+    public function setupDefaultClereReachList()
+    {
         
         //Check if we connected to Cr account
         if (!$this->isConnected()) {
@@ -573,22 +570,21 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
         $return = false;
         
         try {
-
             $return = $this->setupGroupFields($this->_helper->getDefaultListId());
             $groups = $this->_helper->getGroupsIds();
-            foreach ($groups as $groupId){
+            foreach ($groups as $groupId) {
                 $return = $this->setupGroupFields($groupId);
             }
             
             
-        } catch(Exception $e) {
-        
+        } catch (Exception $e) {
             return false;
             
         }
         return $return;
     }
-    public function setupGroupFields($listId){
+    public function setupGroupFields($listId)
+    {
      
         $return = false;
         
@@ -608,14 +604,13 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
                         "store" => "store");
         
         $return = $this->_client->groupGetDetails($this->_apiKey, $listId);
-        if($return->status == "SUCCESS"){
-
-            foreach($return->data->attributes as $a){
-                if(in_array($a->key, $fields)){
+        if ($return->status == "SUCCESS") {
+            foreach ($return->data->attributes as $a) {
+                if (in_array($a->key, $fields)) {
                     unset($fields[$a->key]);
                 }
             }
-            foreach($fields as $field){
+            foreach ($fields as $field) {
                 $return = $this->_client->groupAttributeAdd($this->_apiKey, $listId, $field, "text", "");
             }
         }

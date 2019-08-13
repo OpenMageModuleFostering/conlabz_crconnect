@@ -1,7 +1,9 @@
 <?php
-class Conlabz_CrConnect_SearchController extends Mage_Core_Controller_Front_Action {
+class Conlabz_CrConnect_SearchController extends Mage_Core_Controller_Front_Action
+{
 
-    public function indexAction() {
+    public function indexAction()
+    {
 
         $systemPassword = Mage::helper("crconnect")->getCleverReachFeedPassword();
 
@@ -27,5 +29,4 @@ class Conlabz_CrConnect_SearchController extends Mage_Core_Controller_Front_Acti
 
         $this->getResponse()->setBody(json_encode($returnData));
     }
-
 }

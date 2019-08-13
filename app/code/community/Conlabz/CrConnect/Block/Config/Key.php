@@ -21,5 +21,4 @@ class Conlabz_CrConnect_Block_Config_Key extends Mage_Adminhtml_Block_System_Con
         return '<div style="width:430px">'.$element."</div>";
         
     }
-	
 }

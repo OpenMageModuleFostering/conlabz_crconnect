@@ -21,11 +21,10 @@ class Conlabz_CrConnect_Block_GroupsApis extends Mage_Adminhtml_Block_System_Con
         
         // customer options
         $this->magentoOptions = array();
-		$allGroups = Mage::getModel('customer/group')->getCollection()->toOptionHash();
-        foreach($allGroups as $key=>$allGroup){
-        	$this->magentoOptions[$key] = $allGroup;
+        $allGroups = Mage::getModel('customer/group')->getCollection()->toOptionHash();
+        foreach ($allGroups as $key => $allGroup) {
+            $this->magentoOptions[$key] = $allGroup;
         }
-		
     }
 
     protected function _renderCellTemplate($columnName)
@@ -36,17 +35,13 @@ class Conlabz_CrConnect_Block_GroupsApis extends Mage_Adminhtml_Block_System_Con
         $column     = $this->_columns[$columnName];
         $inputName  = $this->getElement()->getName() . '[#{_id}][' . $columnName . ']';
 
-        if($columnName == 'magento')
-        {
+        if ($columnName == 'magento') {
             $rendered = '<select name="'.$inputName.'">';
-            foreach($this->magentoOptions as $att => $name)
-            {
+            foreach ($this->magentoOptions as $att => $name) {
                 $rendered .= '<option value="'.$att.'">'.$name.'</option>';
             }
             $rendered .= '</select>';
-        }
-        else
-        {
+        } else {
             return '<input type="text" name="' . $inputName . '" value="#{' . $columnName . '}" ' . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';
         }
         

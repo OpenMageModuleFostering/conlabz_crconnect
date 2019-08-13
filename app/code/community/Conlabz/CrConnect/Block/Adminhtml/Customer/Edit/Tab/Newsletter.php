@@ -28,10 +28,11 @@ class Conlabz_CrConnect_Block_Adminhtml_Customer_Edit_Tab_Newsletter extends Mag
         $fieldset = $form->addFieldset('base_fieldset', array('legend'=>Mage::helper('customer')->__('Newsletter Information')));
 
         $isMultiply = Mage::helper("crconnect")->getGroupsIds($customer->getGroupId());
-        if (!Mage::helper('crconnect')->isShowDefaultGroup() || !$isMultiply){
-        
-            $fieldset->addField('subscription', 'checkbox',
-                 array(
+        if (!Mage::helper('crconnect')->isShowDefaultGroup() || !$isMultiply) {
+            $fieldset->addField(
+                'subscription',
+                'checkbox',
+                array(
                         'label' => Mage::helper('customer')->__('Subscribed to Newsletter?'),
                         'name'  => 'subscription'
                  )
@@ -45,10 +46,11 @@ class Conlabz_CrConnect_Block_Adminhtml_Customer_Edit_Tab_Newsletter extends Mag
 
         }
         
-        if (Mage::helper("crconnect")->isDefaultGroupUser($customer->getGroupId())){
-            
+        if (Mage::helper("crconnect")->isDefaultGroupUser($customer->getGroupId())) {
             $groupName = Mage::getModel('customer/group')->load($customer->getGroupId())->getCode();
-            $fieldset->addField('gsubscription', 'checkbox',
+            $fieldset->addField(
+                'gsubscription',
+                'checkbox',
                 array(
                    'label' => Mage::helper('customer')->__('Subscribed to %s Newsletter?', $groupName),
                    'name'  => 'gsubscription'
@@ -56,26 +58,27 @@ class Conlabz_CrConnect_Block_Adminhtml_Customer_Edit_Tab_Newsletter extends Mag
             );
             
             $ifCustomSubscribed = Mage::getModel('crconnect/api')->isSubscribed(
-                        $customer->getEmail(), 
-                        $customer->getGroupId()
-                    );
+                $customer->getEmail(),
+                $customer->getGroupId()
+            );
             
             $form->getElement('gsubscription')->setIsChecked($ifCustomSubscribed);
 
         }
         
-        if($changedDate = $this->getStatusChangedDate()) {
-             $fieldset->addField('change_status_date', 'label',
+        if ($changedDate = $this->getStatusChangedDate()) {
+             $fieldset->addField(
+                 'change_status_date',
+                 'label',
                  array(
                         'label' => $subscriber->isSubscribed() ? Mage::helper('customer')->__('Last Date Subscribed') : Mage::helper('customer')->__('Last Date Unsubscribed'),
                         'value' => $changedDate,
                         'bold'  => true
                  )
-            );
+             );
         }
 
         $this->setForm($form);
         return $this;
     }
-
 }

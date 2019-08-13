@@ -1,5 +1,5 @@
 <?php
-class Conlabz_CrConnect_Block_Customer_Newsletter extends Mage_Customer_Block_Newsletter 
+class Conlabz_CrConnect_Block_Customer_Newsletter extends Mage_Customer_Block_Newsletter
 {
 
     private $_api;
@@ -12,7 +12,8 @@ class Conlabz_CrConnect_Block_Customer_Newsletter extends Mage_Customer_Block_Ne
         parent::__construct();
     }
     
-    public function getCustomerGroupName(){
+    public function getCustomerGroupName()
+    {
         
         $groupName = Mage::getModel('customer/group')->load($this->getCustomerGroupId())->getCode();
 
@@ -22,26 +23,27 @@ class Conlabz_CrConnect_Block_Customer_Newsletter extends Mage_Customer_Block_Ne
      * 
      * @return bool
      */
-    public function isDefaultGroupUser(){
+    public function isDefaultGroupUser()
+    {
 
         return Mage::helper("crconnect")->isDefaultGroupUser($this->getCustomerGroupId());
         
     }
     
-    public function isDefaultSubscribed(){
+    public function isDefaultSubscribed()
+    {
        
         return $this->_api->isSubscribed(Mage::getSingleton('customer/session')->getCustomer()->getEmail());
         
     }
     
-    public function isCustomSubscribed(){
+    public function isCustomSubscribed()
+    {
     
         return $this->_api->isSubscribed(
-                                            Mage::getSingleton('customer/session')->getCustomer()->getEmail(), 
-                                            Mage::getSingleton('customer/session')->getCustomerGroupId()
-                                        );
+            Mage::getSingleton('customer/session')->getCustomer()->getEmail(),
+            Mage::getSingleton('customer/session')->getCustomerGroupId()
+        );
         
     }
-    
-
 }

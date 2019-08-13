@@ -21,11 +21,12 @@
 
 class Conlabz_CrConnect_Model_Website_Observer
 {
-	public function trackingCodeCheck(){
-		$mailingId = Mage::getSingleton('core/app')->getRequest()->getParam('crmailing');
-		$cookie = Mage::getSingleton('core/cookie');
-		if ($mailingId){
-			$cookie->set('crmailing', $mailingId ,time()+3600*24*14,'/');
-		}
-	}
+    public function trackingCodeCheck()
+    {
+        $mailingId = Mage::getSingleton('core/app')->getRequest()->getParam('crmailing');
+        $cookie = Mage::getSingleton('core/cookie');
+        if ($mailingId) {
+            $cookie->set('crmailing', $mailingId, time()+3600*24*14, '/');
+        }
+    }
 }

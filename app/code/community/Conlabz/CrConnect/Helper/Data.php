@@ -1,6 +1,7 @@
 <?php
 
-class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
+class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract
+{
 
     const XML_WSDL_PATH = "http://api.cleverreach.com/soap/interface_v5.1.php?wsdl";
     const XML_API_KEY_CONFIG_PATH = "crroot/crconnect/api_key";
@@ -22,147 +23,156 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
     private $_currentStoreId = false;
     private $_currentWebsiteId = false;
 
-    public function setCurrentStoreId($storeId = false){
+    public function setCurrentStoreId($storeId = false)
+    {
         $this->_currentStoreId = $storeId;
     }
-    public function setCurrentWebsiteId($storeId = false){
+
+    public function setCurrentWebsiteId($storeId = false)
+    {
         $this->_currentWebsiteId = $storeId;
     }
 
-    /*
+    /**
      *  Get Wsdl path
      *
      *  @return string - path
      */
-
-    public function getWsdl() {
+    public function getWsdl()
+    {
         return self::XML_WSDL_PATH;
     }
 
-    /*
+    /**
      * Get Feed password (same should be inserted on CleverReach account)
      */
-
-    public function getCleverReachFeedPassword() {
+    public function getCleverReachFeedPassword()
+    {
         return $this->getConfigForStore(self::XML_FEED_PASSWORD);
     }
     
-    /*
+    /**
      * Is exclude M2E orders from sync
      */
-    public function isM2eExclude(){
+    public function isM2eExclude()
+    {
         return $this->getConfigForStore(self::XML_SYNC_ORDERS_M2E_PATH);
     }
-    /*
+
+    /**
      * Check if Douple Opt In enabled
      */
-
-    public function isDoubleOptInEnabled() {
+    public function isDoubleOptInEnabled()
+    {
         return $this->getConfigForStore(self::XML_PATH_LOGGED_CONFIRM_EMAIL_TEMPLATE);
     }
 
-    /*
+    /**
      *  Get Api Key
      *
      *  @return string - api key
      */
-
-    public function getApiKey() {
+    public function getApiKey()
+    {
         return $this->getConfigForStore(self::XML_API_KEY_CONFIG_PATH);
     }
     
-    /*
+    /**
      *  Set Api Key
      *
      *  @return string - api key
      */
-    public function setApiKey($key) {
+    public function setApiKey($key)
+    {
         return Mage::getConfig()->saveConfig(self::XML_API_KEY_CONFIG_PATH, $key);
     }
 
-    /*
+    /**
      *  Get Default List Id
      *
      *  @return string - list Id
      */
-
-    public function getDefaultListId() {
+    public function getDefaultListId()
+    {
         
         return $this->getConfigForStore(self::XML_LIST_ID_CONFIG_PATH);
 
     }
     
-    /*
+    /**
      *  Get Default Form Id
      *
      *  @return string - list Id
      */
-
-    public function getDefaultFormId() {
+    public function getDefaultFormId()
+    {
         
         return $this->getConfigForStore(self::XML_FORM_ID_CONFIG_PATH);
 
     }
 
-    /*
+    /**
      *  Check if orders tracking enabled
      *
      *  @return bool - 0 or 1
      */
-
-    public function isTrackingEnabled() {
+    public function isTrackingEnabled()
+    {
         return $this->getConfigForStore(self::XML_SYNC_ORDERS_CONFIG_PATH);
     }
 
-    /*
+    /**
      *  Check if automated separation enabled
      *
      *  @return bool - 0 or 1
      */
-
-    public function isSeparationEnabled() {
+    public function isSeparationEnabled()
+    {
         return $this->getConfigForStore(self::XML_GROUP_SEPARATION_CONFIG_PATH);
     }
 
-    /*
+    /**
      * Log Clever Reach Connect activity
      * 
      * @param - string message
      */
-
-    public function log($message) {
+    public function log($message)
+    {
 
         Mage::log($message, null, "crconnect.log", true);
     }
     
-    /*
+    /**
      * Get if sync order emails enabled
      */
-    public function isForceSyncEnabled(){
+    public function isForceSyncEnabled()
+    {
         return Mage::getStoreConfig(self::XML_SYNC_ORDERS_EMAILS_CONFIG_PATH);
     }
 
-    /*
+    /**
      * Get groups keys json value from system settings
      * 
      * @return json
      */
-    public function getGroupsSystemValue(){
+    public function getGroupsSystemValue()
+    {
         
         return $this->getConfigForStore(self::XML_GROUP_KEYS);
         
     }
     
-    public function getConfigForStore($path){
+    public function getConfigForStore($path)
+    {
         
         $newsletterConfig = Mage::getStoreConfig($path);
         
-        if ($store = $this->_currentStoreId){
+        if ($store = $this->_currentStoreId) {
             return Mage::getStoreConfig($path, $store);
         }
-        if ($website = $this->_currentWebsiteId){
+        if ($website = $this->_currentWebsiteId) {
             $newsletterConfig = (array)Mage::getConfig()->getNode('websites/'.$website.'/'.$path);
-            if (isset($newsletterConfig[0])){
+            if (isset($newsletterConfig[0])) {
                 return $newsletterConfig[0];
             }
         }
@@ -173,12 +183,12 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
 //            }
 //        }
         
-        if ($store = Mage::app()->getRequest()->getParam('store')){
+        if ($store = Mage::app()->getRequest()->getParam('store')) {
             $newsletterConfig = Mage::getStoreConfig($path, $store);
-        }else{
-            if ($website = Mage::app()->getRequest()->getParam('website')){
+        } else {
+            if ($website = Mage::app()->getRequest()->getParam('website')) {
                 $newsletterConfig = (array)Mage::getConfig()->getNode('websites/'.$website.'/'.$path);
-                if (isset($newsletterConfig[0])){
+                if (isset($newsletterConfig[0])) {
                     $newsletterConfig = $newsletterConfig[0];
                 }
             }
@@ -186,7 +196,8 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         return $newsletterConfig;
         
     }
-    /*
+
+    /**
      * get non default groups ids
      * 
      * @param int group ID - if isset get key for special group
@@ -194,8 +205,8 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
      * 
      * @return array | int = array of keys, OR groups ID
      */
-
-    public function getGroupsIds($groupId = false, $defaultOnFail = false) {
+    public function getGroupsIds($groupId = false, $defaultOnFail = false)
+    {
 
         $newsletterConfig = unserialize($this->getConfigForStore(self::XML_GROUP_KEYS));
         $keysArray = array();
@@ -220,7 +231,7 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         return $keysArray;
     }
     
-    /*
+    /**
      * get non default forms ids
      * 
      * @param int group ID - if isset get key for special group
@@ -228,8 +239,8 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
      * 
      * @return array | int = array of keys, OR groups ID
      */
-
-    public function getFormsIds($groupId = false, $defaultOnFail = false) {
+    public function getFormsIds($groupId = false, $defaultOnFail = false)
+    {
 
         $newsletterConfig = unserialize($this->getConfigForStore(self::XML_GROUP_KEYS));
         $keysArray = array();
@@ -255,13 +266,13 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         return $keysArray;
     }
     
-    /*
+    /**
      * get non default forms ids
      * 
      * @return array | int = array of keys, OR groups ID
      */
-
-    public function getFormsIdsByKeys() {
+    public function getFormsIdsByKeys()
+    {
 
         $newsletterConfig = unserialize($this->getConfigForStore(self::XML_GROUP_KEYS));
         
@@ -269,8 +280,8 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
 
         // Generate array of groupId=>key
         if (is_array($newsletterConfig)) {
-            foreach ($newsletterConfig as $key=>$config) {
-                if (isset($config['formid'])){
+            foreach ($newsletterConfig as $key => $config) {
+                if (isset($config['formid'])) {
                     $keysArray[$key] = $config['formid'];
                 }
             }
@@ -279,11 +290,11 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         return $keysArray;
     }
 
-    /*
+    /**
      * get active subscribers
      */
-
-    public function getActiveMageSubscribers() {
+    public function getActiveMageSubscribers()
+    {
 
         return Mage::getResourceModel('newsletter/subscriber_collection')
                         ->showStoreInfo()
@@ -292,13 +303,14 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
                         ->getData();
     }
 
-    public function prepareUserdata($customer, $custom_fields = false, $deactivate = false) {
+    public function prepareUserdata($customer, $custom_fields = false, $deactivate = false)
+    {
 
         $name = $customer->getFirstname() . " " . $customer->getLastname();
         $newEmail = $customer->getEmail();
         $subscribed = $customer->getIsSubscribed();
         $shippingAddress = false;
-        if ($shippingAddress = $customer->getDefaultBillingAddress()){
+        if ($shippingAddress = $customer->getDefaultBillingAddress()) {
             $shippingAddress = $shippingAddress->getData();
         }
 
@@ -332,7 +344,7 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
                 3 => array("key" => 'title', "value" => @$customer->getSuffix()));
         }
 
-        if($deactivate){
+        if ($deactivate) {
             $crReceiver['deactivated'] = 1;
         }
 
@@ -350,38 +362,38 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract {
         return $crReceiver;
     }
 
-    /*
+    /**
      * Show or not customer group as separate group
      */
-    public function isShowDefaultGroup(){
+    public function isShowDefaultGroup()
+    {
 
         return $this->getConfigForStore(self::XML_IS_SHOW_CUSTOMER_GROUP);
         
     }
     
-    /*
+    /**
      * If more then 1 user group key added, return true
      */
-    public function isMultiGroupsSettings(){
-        
+    public function isMultiGroupsSettings()
+    {        
         $groupIds = $this->getGroupsIds();
-        if (is_array($groupIds) && sizeof($groupIds) > 1){
+        if (is_array($groupIds) && sizeof($groupIds) > 1) {
             return true;
         }
-        return false;
-        
+        return false;        
     }
-    public function isDefaultGroupUser($groupId){
-        
-        if ($groupId != self::DEFAULT_GROUP_ID){
-            return true;
-        }
-        return false;
-        
-    }
-    public function getM2eShippingMethods(){
-        
-        return array("m2eproshipping_m2eproshipping");
 
+    public function isDefaultGroupUser($groupId)
+    {        
+        if ($groupId != self::DEFAULT_GROUP_ID) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function getM2eShippingMethods()
+    {        
+        return array("m2eproshipping_m2eproshipping");
     }
 }

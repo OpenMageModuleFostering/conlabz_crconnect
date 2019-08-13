@@ -1,13 +1,15 @@
 <?php
 
-class Conlabz_CrConnect_Model_Newsletter_Subscriber extends Mage_Newsletter_Model_Subscriber {
+class Conlabz_CrConnect_Model_Newsletter_Subscriber extends Mage_Newsletter_Model_Subscriber
+{
 
     /*
      * Check If customer is subscribed
      */
-    public function isSubscribed($groupId = 0) {
+    public function isSubscribed($groupId = 0)
+    {
 
-        if (!$this->getEmail()){
+        if (!$this->getEmail()) {
             $this->setEmail(Mage::getSingleton('customer/session')->getCustomer()->getEmail());
         }
         return Mage::getModel("crconnect/api")->isSubscribed($this->getEmail(), $groupId);
@@ -20,7 +22,8 @@ class Conlabz_CrConnect_Model_Newsletter_Subscriber extends Mage_Newsletter_Mode
      * @throws Exception
      * @return int
      */
-    public function subscribe($email, $groupId = 0) {
+    public function subscribe($email, $groupId = 0)
+    {
 
         if (Mage::helper("customer")->isLoggedIn()) {
             $customerSession = Mage::getSingleton('customer/session');
@@ -46,5 +49,4 @@ class Conlabz_CrConnect_Model_Newsletter_Subscriber extends Mage_Newsletter_Mode
             parent::sendConfirmationSuccessEmail();
         }
     }
-
 }

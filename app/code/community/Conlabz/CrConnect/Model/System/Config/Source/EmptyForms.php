@@ -26,5 +26,4 @@ class Conlabz_CrConnect_Model_System_Config_Source_EmptyForms
 //            1 => Mage::helper('adminhtml')->__('Yes'),
 //        );
 //    }
-
 }

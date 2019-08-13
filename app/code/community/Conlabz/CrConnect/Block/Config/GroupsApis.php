@@ -32,10 +32,10 @@ class Conlabz_CrConnect_Block_Config_GroupsApis extends Mage_Adminhtml_Block_Sys
         // Get Magento Groups List
         $this->magentoOptions = array();
         $allGroups = Mage::getModel('customer/group')->getCollection()->toOptionHash();
-        foreach($allGroups as $key=>$allGroup){
+        foreach ($allGroups as $key => $allGroup) {
             $this->magentoOptions[$key] = $allGroup;
         }
-		
+        
     }
     /*
      * Render Template
@@ -53,27 +53,24 @@ class Conlabz_CrConnect_Block_Config_GroupsApis extends Mage_Adminhtml_Block_Sys
 
         $api = Mage::getModel("crconnect/api");
         $groups = array();
-        if ($api->isConnected()){
+        if ($api->isConnected()) {
             $groups = $api->getGroupsForKey(Mage::helper('crconnect')->getApiKey());
-            if (!$groups){
+            if (!$groups) {
                 $groups = array();
             }
         }
         
-        switch($columnName){
-            
+        switch ($columnName) {
             case 'magento':
                 $rendered = '<select style="width: 200px" name="'.$inputName.'" id="'.$inputId.'">';
-                foreach($this->magentoOptions as $att => $name)
-                {
+                foreach ($this->magentoOptions as $att => $name) {
                     $rendered .= '<option value="'.$att.'">'.$name.'</option>';
                 }
                 $rendered .= '</select>';
                 break;
             case 'crconnect':
                 $rendered = '<select style="width: 200px" class="crconnect-groups-select" onchange="Crconnect.changeSubGroup(this)" id="'.$inputId.'" name="'.$inputName.'"><option value="">'.Mage::helper('crconnect')->__('Please select subscribers group').'</option>';
-                foreach($groups as $group)
-                {
+                foreach ($groups as $group) {
                     $rendered .= '<option value="'.$group->id.'">'.$group->name.'</option>';
                 }
                 $rendered .= '</select>';
@@ -81,8 +78,7 @@ class Conlabz_CrConnect_Block_Config_GroupsApis extends Mage_Adminhtml_Block_Sys
             case 'formid':
                 $emptyForms = Mage::getModel("crconnect/system_config_source_emptyForms")->toOptionArray();
                 $rendered = '<select style="width: 200px" name="'.$inputName.'" id="'.$inputId.'" class="crconnect-forms-select">';
-                foreach($emptyForms as $emptyForm)
-                {
+                foreach ($emptyForms as $emptyForm) {
                     $rendered .= '<option value="'.$emptyForm['value'].'">'.$emptyForm['label'].'</option>';
                 }
                 $rendered .= '</select>';

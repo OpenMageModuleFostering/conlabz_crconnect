@@ -20,23 +20,23 @@
  */
 include "Mage/Newsletter/controllers/SubscriberController.php";
 
-class Conlabz_CrConnect_SubscriberController extends Mage_Newsletter_SubscriberController {
+class Conlabz_CrConnect_SubscriberController extends Mage_Newsletter_SubscriberController
+{
 
     const XML_PATH_LOGGED_CONFIRM_EMAIL_TEMPLATE = 'newsletter/subscription/confirm_logged_email_template';
 
-    public function newAction() {
+    public function newAction()
+    {
 
         if ($this->getRequest()->isPost() && $this->getRequest()->getPost('email')) {
-
             $session = Mage::getSingleton('core/session');
             $customerSession = Mage::getSingleton('customer/session');
             $email = (string) $this->getRequest()->getPost('email');
 
             try {
-
                 $status = Mage::getModel("newsletter/subscriber")->subscribe($email);
                 
-                if ($status){
+                if ($status) {
                     if (Mage::helper("crconnect")->isDoubleOptInEnabled()) {
                         Mage::getSingleton('core/session')->addSuccess($this->__('Confirmation request has been sent.'));
                     } else {
@@ -51,5 +51,4 @@ class Conlabz_CrConnect_SubscriberController extends Mage_Newsletter_SubscriberC
             }
         }
     }
-
 }

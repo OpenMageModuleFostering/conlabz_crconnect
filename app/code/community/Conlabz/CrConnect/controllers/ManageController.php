@@ -2,22 +2,22 @@
 
 include "Mage/Newsletter/controllers/ManageController.php";
 
-class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageController {
+class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageController
+{
 
-    public function saveAction() {
+    public function saveAction()
+    {
     
         if (!$this->_validateFormKey()) {
             return $this->_redirect('customer/account/');
         }
         try {
-
-            $email = Mage::getSingleton('customer/session')->getCustomer()->getEmail();    
+            $email = Mage::getSingleton('customer/session')->getCustomer()->getEmail();
             $subscriber = Mage::getModel("newsletter/subscriber")->loadByEmail($email);
             $subscriber->setEmail(Mage::getSingleton('customer/session')->getCustomer()->getEmail());
 
             if ((boolean) $this->getRequest()->getParam('is_subscribed', false)) {
                 if (!$subscriber->isSubscribed()) {
-                    
                     $status = Mage::getModel("newsletter/subscriber")->subscribe($email);
                     if (Mage::helper("crconnect")->isDoubleOptInEnabled()) {
                         Mage::getSingleton('customer/session')->addSuccess($this->__('Confirmation request has been sent.'));
@@ -36,9 +36,7 @@ class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageControlle
             $groupId = Mage::getSingleton('customer/session')->getCustomerGroupId();
             if ($groupId > 1) {
                 if ((boolean) $this->getRequest()->getParam('is_gsubscribed', false)) {
-
                     if (!$subscriber->isSubscribed($groupId)) {
-
                         $status = Mage::getModel("newsletter/subscriber")->subscribe(Mage::getSingleton('customer/session')->getCustomer()->getEmail(), $groupId);
                         if (Mage::helper("crconnect")->isDoubleOptInEnabled()) {
                             Mage::getSingleton('customer/session')->addSuccess($this->__('Confirmation request has been sent.'));
@@ -59,5 +57,4 @@ class Conlabz_CrConnect_ManageController extends Mage_Newsletter_ManageControlle
         }
         $this->_redirect('customer/account/');
     }
-
 }
