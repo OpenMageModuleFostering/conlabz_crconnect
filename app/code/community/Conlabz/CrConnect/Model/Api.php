@@ -221,6 +221,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
     public function clientGetDetails()
     {
         $result = $this->_client->clientGetDetails($this->_apiKey);
+        $this->_helper->log($result->message);
         if ($result->status == self::SUCCESS_STATUS) {
             return $this->returnResult($result->data);
         } else {
@@ -319,15 +320,17 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
     public function receiverAddOrder($email, $orderInfo)
     {
         $listId = $this->_helper->getDefaultListId();
-        $result = $this->_client->receiverAddOrder($this->_apiKey, $listId, $email, $orderInfo);
-        Mage::helper("crconnect")->log("CALL receiverAddOrder: ".$email);
-        Mage::helper("crconnect")->log($orderInfo);
-        Mage::helper("crconnect")->log($result);
-        if ($result->status == self::SUCCESS_STATUS) {
-            return true;
-        } else {
-            return false;
-        }
+
+        $result = $this->_client->receiverUpdate($this->_apiKey, $listId, array(
+            "email" => $email,
+            "orders" => $orderInfo
+        ));
+
+        $this->_helper->log("CALL receiverAddOrder: ".$email);
+        $this->_helper->log($orderInfo);
+        $this->_helper->log($result);
+
+        return ($result->status === self::SUCCESS_STATUS);
     }
 
     /**
@@ -464,45 +467,46 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
         $this->_helper->log("RUN SYNCHRONIZATION");
 
         $subscribers = $this->_helper->getActiveMageSubscribers();
+
         $syncedUsers = 0;
         $batch = array();
         $i = 0;
 
-        foreach ($subscribers as $subscriber) {
-            $userGroup = 0;
-            // If we should separate customers to different groups, then get customer Groups iD if exists
-            if ($this->_helper->isSeparationEnabled()) {
-                if ($subscriber["subscriber_email"]) {
-                    // get customer by subscriber E-mail
-                    $systemCustomer = Mage::getModel("customer/customer")->setWebsiteId($subscriber['website_id'])->loadByEmail($subscriber["subscriber_email"]);
-                    if ($systemCustomer->getId()) {
-                        $userGroup = $systemCustomer->getGroupId();
+        try {
+            foreach ($subscribers as $subscriber) {
+                $userGroup = 0;
+                // If we should separate customers to different groups, then get customer Groups iD if exists
+                if ($this->_helper->isSeparationEnabled()) {
+                    if ($subscriber["subscriber_email"]) {
+                        // get customer by subscriber E-mail
+                        $systemCustomer = Mage::getModel("customer/customer")->setWebsiteId($subscriber['website_id'])->loadByEmail($subscriber["subscriber_email"]);
+                        if ($systemCustomer->getId()) {
+                            $userGroup = $systemCustomer->getGroupId();
+                        }
                     }
+                }
+
+                if (isset($subscriber['customer_id']) && $subscriber['customer_id']) {
+                    $tmp = $this->_helper->prepareUserdata(Mage::getModel("customer/customer")->load($subscriber['customer_id']));
+                } else {
+                    $tmp["email"] = $subscriber["subscriber_email"];
+                    $tmp["source"] = "MAGENTO";
+                    // Prepare customer attributes
+                    $firstname = isset($subscriber['customer_firstname']) ? $subscriber['customer_firstname'] : null;
+                    $lastname  = isset($subscriber['customer_lastname']) ? $subscriber['customer_lastname'] : null;
+                    $tmp["attributes"] = array(
+                        array("key" => "firstname",  "value" => $firstname),
+                        array("key" => "lastname",   "value" => $lastname),
+                        array("key" => "newsletter", "value" => 1)
+                    );
+                }
+
+                // Separate users by Batch, 25 users in one
+                if ($tmp["email"]) {
+                    $batch[$subscriber["store_id"]][$userGroup][floor($i++ / 25)][] = $tmp; //max 25 per batch
                 }
             }
 
-            if (isset($subscriber['customer_id']) && $subscriber['customer_id']) {
-                $tmp = $this->_helper->prepareUserdata(Mage::getModel("customer/customer")->load($subscriber['customer_id']));
-            } else {
-                $tmp["email"] = $subscriber["subscriber_email"];
-                $tmp["source"] = "MAGENTO";
-                // Prepare customer attributes
-                $firstname = isset($subscriber['customer_firstname']) ? $subscriber['customer_firstname'] : null;
-                $lastname  = isset($subscriber['customer_lastname']) ? $subscriber['customer_lastname'] : null;
-                $tmp["attributes"] = array(
-                    array("key" => "firstname",  "value" => $firstname),
-                    array("key" => "lastname",   "value" => $lastname),
-                    array("key" => "newsletter", "value" => 1)
-                );
-            }
-
-            // Separate users by Batch, 25 users in one
-            if ($tmp["email"]) {
-                $batch[$subscriber["store_id"]][$userGroup][floor($i++ / 25)][] = $tmp; //max 25 per batch
-            }
-        }
-
-        try {
             // send subscribers batch to CleverReach
             if ($batch) {
                 foreach ($batch as $storeId => $groupBatch) {
@@ -583,12 +587,12 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
         );
 
         $groupDetails = $this->_client->groupGetDetails($this->_apiKey, $listId);
-        
+
         if ($groupDetails->status !== self::SUCCESS_STATUS) {
             $this->_helper->log("CleverReach Connection Error: " . $groupDetails->message);
             return $groupDetails;
         }
-        
+
         foreach ($groupDetails->data->attributes as $a) {
             if (in_array($a->key, $fields)) {
                 unset($fields[$a->key]);

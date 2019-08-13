@@ -314,11 +314,12 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract
             $group = $group->getData();
         }
 
+        $crReceiver = array(
+            'email' => $newEmail,
+            'source' => 'MAGENTO'
+        );
 
         if ($shippingAddress) {
-            $crReceiver = array(
-                'email' => $newEmail,
-                'source' => 'MAGENTO');
             $crReceiver["attributes"] = array(
                 0 => array("key" => "firstname", "value" => @$shippingAddress["firstname"]),
                 1 => array("key" => "lastname", "value" => @$shippingAddress["lastname"]),
@@ -330,11 +331,8 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract
                 7 => array("key" => "title", "value" => @$shippingAddress["suffix"]),
                 8 => array("key" => "company", "value" => @$shippingAddress["company"]));
         } else {
-            $crReceiver = array(
-                'email' => $newEmail,
-                'source' => "MAGENTO"
-            );
-            $crReceiver["attributes"] = array(0 => array("key" => 'firstname', "value" => @$customer->getFirstname()),
+            $crReceiver["attributes"] = array(
+                0 => array("key" => 'firstname', "value" => @$customer->getFirstname()),
                 1 => array("key" => 'lastname', "value" => @$customer->getLastname()),
                 2 => array("key" => 'salutation', "value" => @$customer->getPrefix()),
                 3 => array("key" => 'title', "value" => @$customer->getSuffix()));
@@ -348,6 +346,38 @@ class Conlabz_CrConnect_Helper_Data extends Mage_Core_Helper_Abstract
         array_push($crReceiver["attributes"], array("key" => 'group_name', "value" => @$group["customer_group_code"]));
         array_push($crReceiver["attributes"], array("key" => 'gender', "value" => @$customer->getGender()));
         array_push($crReceiver["attributes"], array("key" => 'store', "value" => @Mage::getModel('customer/customer')->load($customer->getId())->getData("created_in")));
+
+        if ($this->isTrackingEnabled()) {
+            $crReceiver['orders'] = array();
+
+            $orders = Mage::getModel('sales/order')->getCollection()->addFieldToSelect(array('entity_id', 'increment_id'))->addFieldToFilter('customer_email', $newEmail);
+            foreach ($orders as $order)
+            {
+                $items = $order->getAllVisibleItems();
+                foreach ($items as $item)
+                {
+                    $crOrder = array();
+                    $crOrder["order_id"] = $order->getIncrementId();
+                    $crOrder["product"] = $item->getName();
+                    $crOrder["product_id"] = $item->getProductId();
+                    $crOrder["price"] = round($item->getPrice(), 2);
+                    $crOrder["quantity"] = (integer)$item->getQtyOrdered();
+                    $crOrder["purchase_date"] = time();
+                    $crOrder["currency"] = $order->getData('order_currency_code');
+                    $crOrder["source"] = "MAGENTO Order";
+
+                    $cookie = Mage::getSingleton('core/cookie');
+                    if ($cookie->get('crmailing')) {
+                        $crOrder['mailings_id'] = $cookie->get('crmailing');
+                    }
+                    $crReceiver['orders'][] = $crOrder;
+                }
+            }
+
+            if (empty($crReceiver['orders'])) {
+                unset($crReceiver['orders']);
+            }
+        }
 
         if ($custom_fields) {
             foreach ($custom_fields as $key => $val) {

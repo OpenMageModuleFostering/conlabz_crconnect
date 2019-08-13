@@ -39,4 +39,9 @@ class Conlabz_CrConnect_Block_Customer_Newsletter extends Mage_Customer_Block_Ne
             Mage::getSingleton('customer/session')->getCustomerGroupId()
         );
     }
+
+    public function getAction()
+    {
+        return $this->getUrl('*/*/save', array('_secure' => Mage::app()->getStore()->isCurrentlySecure()));
+    }
 }

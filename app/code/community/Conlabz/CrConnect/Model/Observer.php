@@ -94,6 +94,7 @@ class Conlabz_CrConnect_Model_Observer
         if (Mage::helper("crconnect")->isTrackingEnabled()) {
             $items = $order->getAllItems();
             if ($items) {
+                $tmpItems = array();
                 foreach ($items as $item) {
                     $tmpItem = array();
                     $tmpItem["order_id"] = $lastOrderId;
@@ -109,8 +110,9 @@ class Conlabz_CrConnect_Model_Observer
                     if ($cookie->get('crmailing')) {
                         $tmpItem['mailings_id'] = $cookie->get('crmailing');
                     }
-                    Mage::getModel("crconnect/api")->receiverAddOrder($email, $tmpItem);
+                    $tmpItems[] = $tmpItem;
                 }
+                Mage::getModel("crconnect/api")->receiverAddOrder($email, $tmpItems);
             }
         }
     }
