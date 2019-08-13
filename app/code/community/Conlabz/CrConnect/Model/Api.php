@@ -2,6 +2,7 @@
 
 class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
 {
+    private $_apiKey;
 
     const SUCCESS_STATUS = "SUCCESS";
 
@@ -386,8 +387,8 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
 
     /**
      *
-     * @param type $customer
-     * @param type $groupId
+     * @param Mage_Customer_Model_Customer $customer
+     * @param int $groupId
      * @return boolean
      */
     public function formsSendActivationMail($customer, $groupId = 0)
@@ -534,26 +535,30 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
         return $syncedUsers;
     }
 
-    public function setupDefaultClereReachList()
+    public function setupDefaultCleverReachList()
     {
         //Check if we connected to Cr account
         if (!$this->isConnected()) {
             return false;
         }
 
-        $return = false;
-
-        try {
-            $return = $this->setupGroupFields($this->_helper->getDefaultListId());
-            $groups = $this->_helper->getGroupsIds();
-            foreach ($groups as $groupId) {
-                $return = $this->setupGroupFields($groupId);
-            }
-        } catch (Exception $e) {
-            Mage::logException($e);
+        if (empty($this->_apiKey))
+        {
             return false;
         }
-        return $return;
+
+        try {
+            $groups = array($this->_helper->getDefaultListId()) + $this->_helper->getGroupsIds();
+            foreach ($groups as $groupId) {
+                if ( ! ($groupFields = $this->setupGroupFields($groupId))) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
+        return false;
     }
 
     public function setupGroupFields($listId)
@@ -577,16 +582,20 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
             "store"         => "store"
         );
 
-        $return = $this->_client->groupGetDetails($this->_apiKey, $listId);
-        if ($return->status == "SUCCESS") {
-            foreach ($return->data->attributes as $a) {
-                if (in_array($a->key, $fields)) {
-                    unset($fields[$a->key]);
-                }
+        $groupDetails = $this->_client->groupGetDetails($this->_apiKey, $listId);
+        
+        if ($groupDetails->status !== self::SUCCESS_STATUS) {
+            $this->_helper->log("CleverReach Connection Error: " . $groupDetails);
+            return $groupDetails;
+        }
+        
+        foreach ($groupDetails->data->attributes as $a) {
+            if (in_array($a->key, $fields)) {
+                unset($fields[$a->key]);
             }
-            foreach ($fields as $field) {
-                $return = $this->_client->groupAttributeAdd($this->_apiKey, $listId, $field, "text", "");
-            }
+        }
+        foreach ($fields as $field) {
+            $return = $this->_client->groupAttributeAdd($this->_apiKey, $listId, $field, "text", "");
         }
         return $return;
 

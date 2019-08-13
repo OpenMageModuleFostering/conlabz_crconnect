@@ -213,7 +213,7 @@ class Conlabz_CrConnect_Model_Observer
                 $allow = false;
             }
             if (!$allow) {
-                Mage::getSingleton('adminhtml/session')->addError(Mage::helper('catalog')->__('Double Opt-In enabled, please select Form(s) and Group(s) for your Customer Groups'));
+                Mage::getSingleton('adminhtml/session')->addError(Mage::helper('catalog')->__('Double Opt-In is enabled, please select form(s) and group(s) for your customer groups.'));
             }
         }
     }
@@ -222,11 +222,9 @@ class Conlabz_CrConnect_Model_Observer
     {
         $session = Mage::getSingleton('adminhtml/session');
 
-        $setupResult = Mage::getModel('crconnect/api')->setupDefaultClereReachList();
+        $setupResult = Mage::getModel('crconnect/api')->setupDefaultCleverReachList();
         if (!$setupResult) {
-            $session->addError("Could not connect to CleverReach. Please check your API keys.");
-        } elseif ($setupResult->status == "ERROR" && $setupResult->statuscode != 50) {
-            $session->addError("Cleverreach connection Error: " . $setupResult->message);
+            $session->addError("Could not connect to or receive any data from CleverReach. Please check your API key, selected group(s) and form(s).");
         }
     }
 }
