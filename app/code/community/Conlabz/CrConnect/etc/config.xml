@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Conlabz_CrConnect>
-            <version>3.2.0</version>
+            <version>3.2.3</version>
         </Conlabz_CrConnect>
     </modules>
     <global>
@@ -129,12 +129,12 @@
     <admin>
         <routers>
             <adminhtml>
-                <args>
-                    <modules>
-                        <Conlabz_CrConnect after="Mage_Adminhtml">Conlabz_CrConnect_Adminhtml</Conlabz_CrConnect>
-                    </modules>
-                </args>
-            </adminhtml>
+                <args>
+                    <modules>
+                        <Conlabz_CrConnect after="Mage_Adminhtml">Conlabz_CrConnect_Adminhtml</Conlabz_CrConnect>
+                    </modules>
+                </args>
+            </adminhtml>
         </routers>
     </admin>
     <frontend>

@@ -7,6 +7,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
     const SUCCESS_STATUS = "SUCCESS";
 
     const ERROR_CODE_DUPLICATED = 50;
+    const ERROR_CODE_DUPLICATED_WITH_ORDERS = 55;
     const ERROR_CODE_INVALID = 40;
 
     public function __construct()
@@ -429,7 +430,7 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
                 $this->_helper->log("during formsSendActivationMail :: receiverAdd :: ERROR");
                 $this->_helper->log($addResult);
 
-                if ($addResult->statuscode == self::ERROR_CODE_DUPLICATED) {
+                if (in_array($addResult->statuscode, array(self::ERROR_CODE_DUPLICATED, self::ERROR_CODE_DUPLICATED_WITH_ORDERS))) {
                     if ($addResult->data->deactivated == 1) {
                         // Send activation email for customer
                         $formId = $this->_helper->getFormsIds($groupId, true);
@@ -598,6 +599,11 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract
                 unset($fields[$a->key]);
             }
         }
+
+        if (empty($fields)) {
+            return true;
+        }
+
         foreach ($fields as $field) {
             $return = $this->_client->groupAttributeAdd($this->_apiKey, $listId, $field, "text", "");
         }

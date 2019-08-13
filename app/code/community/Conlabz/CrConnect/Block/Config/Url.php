@@ -6,8 +6,8 @@ class Conlabz_CrConnect_Block_Config_Url extends Mage_Adminhtml_Block_System_Con
      */
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
-        $url = Mage::getUrl('crconnect/search/index');
+        $url = Mage::getUrl('crconnect/search/index', array('password' => $this->__('[Your inserted password above]')));
         $url .= "<font color='red'>store/1/</font>";
-        return "<b>".$url."</b>";
+        return '<b style="white-space: nowrap;">'.$url."</b>";
     }
 }
