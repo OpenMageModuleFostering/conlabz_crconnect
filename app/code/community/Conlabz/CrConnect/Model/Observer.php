@@ -22,14 +22,10 @@ class Conlabz_CrConnect_Model_Observer{
         
         $email = $customer->getEmail();    
         
-        Mage::getModel("crconnect/subscriber")->updateCustomer($customer);
-        
         $subscriber = Mage::getModel("newsletter/subscriber")->loadByEmail($email);
         $subscriber->setEmail($email);
         if (Mage::app()->getStore()->isAdmin()){
             return true;
-//            $website = Mage::getModel('core/website')->load($customer->getWebsiteId())->getCode();
-//            Mage::getSingleton("adminhtml/session")->setCrCustomerWebsite($website);
         }
         
         $subscriptionCheckbox1 = Mage::app()->getRequest()->getParam('subscription');
@@ -79,8 +75,6 @@ class Conlabz_CrConnect_Model_Observer{
             }
             
         }
-        
-//        Mage::getSingleton("adminhtml/session")->unsCrCustomerWebsite();
                 
         return true;
         

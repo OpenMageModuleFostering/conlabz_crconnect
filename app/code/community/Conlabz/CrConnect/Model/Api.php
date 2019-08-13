@@ -488,8 +488,6 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
 
             $userGroup = 0;
 
-            $tmp["email"] = "";
-
             // If we should separate customers to different groups, then get customer Groups iD if exists
             if ($this->_helper->isSeparationEnabled()) {
                 if ($subscriber["subscriber_email"]) {
@@ -500,17 +498,24 @@ class Conlabz_CrConnect_Model_Api extends Mage_Core_Model_Abstract {
                     }
                 }
             }
-            $tmp["email"] = $subscriber["subscriber_email"];
-            $tmp["source"] = "MAGENTO";
+            
+            
+            if (isset($subscriber['customer_id']) && $subscriber['customer_id']){
+                $tmp = $this->_helper->prepareUserdata(Mage::getModel("customer/customer")->load($subscriber['customer_id']));
+            }else{
+            
+                $tmp["email"] = $subscriber["subscriber_email"];
+                $tmp["source"] = "MAGENTO";
 
-
-            // Prepare customer attributes
-            $tmp["attributes"] = array(
-                0 => array("key" => "firstname", "value" => @$subscriber["customer_firstname"]),
-                1 => array("key" => "lastname", "value" => @$subscriber["customer_lastname"]),
-                2 => array("key" => "newsletter", "value" => "1")
-            );
-
+                // Prepare customer attributes
+                $tmp["attributes"] = array(
+                    0 => array("key" => "firstname", "value" => @$subscriber["customer_firstname"]),
+                    1 => array("key" => "lastname", "value" => @$subscriber["customer_lastname"]),
+                    2 => array("key" => "newsletter", "value" => "1")
+                );
+            
+            }     
+            
             // Separate users by Batch, 25 users in one
             if ($tmp["email"]) {
                 $batch[$subscriber["store_id"]][$userGroup][floor($i++ / 25)][] = $tmp; //max 25 per batch
